@@ -1,0 +1,6 @@
+[submodule "external-dependencies"]
+	path = external-dependencies
+	url = https://github.com/juhucub/FluidSimulation.git
+[submodule "FluidSimulation"]
+	path = FluidSimulation
+	url = https://github.com/juhucub/FluidSimulation.git
