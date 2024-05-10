@@ -11,7 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #Locate OpenGL, GLEW, and GLFW libraries on system
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(glfw3 REQUIRED)
+
 
 add_executable(FluidSimulation main.cpp)
 target_link_libraries(FluidSimulation ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
