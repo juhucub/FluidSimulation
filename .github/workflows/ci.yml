@@ -46,7 +46,7 @@ jobs:
   
       - name: Setup Clang on macOS
         if: matrix.os == 'macos-latest'
-        run: brew install llvm
+        run: brew install llvm glew
   
       # Create build directory
       - name: Create Build Directory
