@@ -15,4 +15,4 @@ find_package(glfw3 REQUIRED)
 
 add_executable(FluidSimulation main.cpp)
 target_link_libraries(FluidSimulation ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
-target_include_directories(MyOpenGLProject PRIVATE ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS})
+target_include_directories(FluidSimulation PRIVATE ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS})
