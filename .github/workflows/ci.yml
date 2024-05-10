@@ -43,13 +43,14 @@ jobs:
           ninja-version: '1.10.2'
           
       # Setup compilers on Linux and macOS (Windows MSVC is pre-setup in the image)
-      - name: Setup GCC on Linux
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt update && sudo apt install -y g++ make
   
       - name: Setup Clang on macOS
         if: matrix.os == 'macos-latest'
         run: brew install llvm
+
+      - name: Setup GCC on Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt update && sudo apt install -y g++ make
   
       # Create build directory
       - name: Create Build Directory
