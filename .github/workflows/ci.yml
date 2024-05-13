@@ -58,6 +58,6 @@ jobs:
   
       # Build project
       - name: Build
-        run: cmake --build ${{ matrix.build-dir }}
+        run: cmake --build ${{ matrix.build-dir }} --verbose
 
     
