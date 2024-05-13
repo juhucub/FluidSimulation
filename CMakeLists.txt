@@ -21,8 +21,8 @@ pkg_search_module(GLFW REQUIRED glfw3)
 #set(GLFW_LIBRARY_DIRS "/usr/local/lib")
 #set(GLFW_LIBRARIES "glfw")
 
-#set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
-#set(GLEW_LIBRARIES "/opt/homebrew/lib/libGLEW.dylib")
+set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
+set(GLEW_LIBRARIES "/opt/homebrew/lib/libGLEW.dylib")
 
 add_executable(FluidSimulation main.cpp)
 
