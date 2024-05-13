@@ -15,16 +15,17 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/opt/llvm/l
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
 
-set(GLFW_INCLUDE_DIRS "/usr/local/include")
-set(GLFW_LIBRARY_DIRS "/usr/local/lib")
-set(GLFW_LIBRARIES "glfw")
+#set(GLFW_INCLUDE_DIRS "/usr/local/include")
+#set(GLFW_LIBRARY_DIRS "/usr/local/lib")
+#set(GLFW_LIBRARIES "glfw")
 
-set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
-set(GLEW_LIBRARIES "/opt/homebrew/lib/libGLEW.dylib")
-
-include_directories(${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS})
+#set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
+#set(GLEW_LIBRARIES "/opt/homebrew/lib/libGLEW.dylib")
 
 add_executable(FluidSimulation main.cpp)
 
-target_link_libraries(FluidSimulation ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} glfw)
+target_include_directories(FluidSimulation PRIVATE ${OPENGL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
+
+target_link_libraries(FluidSimulation ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${GLFW_LIBRARIES})
