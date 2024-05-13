@@ -15,7 +15,6 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/opt/llvm/l
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_search_module(GLFW REQUIRED glfw3)
 
 #set(GLFW_INCLUDE_DIRS "/usr/local/include")
 #set(GLFW_LIBRARY_DIRS "/usr/local/lib")
