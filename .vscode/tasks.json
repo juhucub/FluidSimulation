@@ -16,7 +16,7 @@
 				"${workspaceFolder}/*.cpp",		//specify which file to execute
 				"${workspaceFolder}/external-dependencies/library/libglfw.3.4.dylib",
 				"-o",
-				"${workspaceFolder}/app", //Define output
+				"${workspaceFolder}/build", //Define output	./build
 				"-framework",
 				"OpenGL",
 				"-framework",
@@ -27,7 +27,6 @@
 				"CoreVideo",
 				"-framework",
 				"CoreFoundation",
-				"-Wno-deprecated",
 				"${fileDirname}/${fileBasenameNoExtension}"
 			],
 			"options": {
