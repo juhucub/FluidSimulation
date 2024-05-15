@@ -46,9 +46,15 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: brew install pkg-config glew glfw
   
-      # Create build directory
-      - name: Create Build Directory
-        run: mkdir ${{ matrix.build-dir }}
+      # Ensure a clean build directory
+      - name: Prepare Build Directory
+        run: |
+          if [ -d ${{ matrix.build-dir }} ]; then
+            echo "Removing existing build directory..."
+            rm -rf ${{ matrix.build-dir }}
+          fi
+          echo "Creating new build directory..."
+          mkdir ${{ matrix.build-dir }}
   
       # Configure CMake
       - name: Configure CMake
