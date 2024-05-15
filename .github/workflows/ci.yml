@@ -50,8 +50,8 @@ jobs:
       - name: Prepare Build Directory
         run: |
           if [ -d ${{ matrix.build-dir }} ]; then
-            echo "Removing existing build directory..."
-            rm -rf ${{ matrix.build-dir }}
+             echo "Removing existing build directory..."
+             rm -rf ${{ matrix.build-dir }}
           fi
           echo "Creating new build directory..."
           mkdir ${{ matrix.build-dir }}
