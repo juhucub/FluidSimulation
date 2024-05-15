@@ -4,6 +4,7 @@
 #include <openglDebug.h>
 #include <demoShader.h>
 #include <iostream>
+#include "Circle.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define EXPORT __declspec(dllexport)
