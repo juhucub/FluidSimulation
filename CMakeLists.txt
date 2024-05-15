@@ -30,11 +30,12 @@ add_subdirectory(external-dependencies/imgui-docking)		#ui
 file(GLOB_RECURSE MY_SOURCES CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/homebrew/opt/llvm/include")
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/opt/llvm/lib -Wl,-rpath,/opt/homebrew/opt/llvm/lib")
-
+set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
+set(GLEW_LIBRARIES "/opt/homebrew/lib/libGLEW.dylib")
 # Find packages
 #Locate OpenGL, GLEW, and GLFW libraries on system
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
+#find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 #set(GLFW_INCLUDE_DIRS "/usr/local/include")
@@ -42,8 +43,7 @@ find_package(PkgConfig REQUIRED)
 #set(GLFW_LIBRARIES "glfw")
 
 
-######set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
-######set(GLEW_LIBRARIES "/opt/homebrew/lib/libGLEW.dylib")
+
 
 #####add_executable(FluidSimulation main.cpp)
 add_executable("${CMAKE_PROJECT_NAME}" ${MY_SOURCES})
