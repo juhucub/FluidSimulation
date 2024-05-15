@@ -38,9 +38,7 @@ jobs:
       # Setup CMake & Ninja 
       - name: Setup Cmake and Ninja
         uses: lukka/get-cmake@latest
-        with:
-          cmakeVersion: '3.20.2'
-          ninjaVersion: '1.10.2'
+        
           
       # Setup compilers on Linux and macOS (Windows MSVC is pre-setup in the image)
   
