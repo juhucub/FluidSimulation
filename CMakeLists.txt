@@ -3,12 +3,6 @@
 
 #Ensures build system features up to date
 cmake_minimum_required(VERSION 3.20.2)
-
-option(PRODUCTION_BUILD " MAKE BUILD" OFF)
-
-#link time optimization
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) 
-
 project(FluidSimulation)
 
 #PRovent GFLW from building unecessary components
@@ -16,6 +10,11 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+
+option(PRODUCTION_BUILD " MAKE BUILD" OFF)
+
+#link time optimization
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) 
 
 add_subdirectory(external-dependencies/glfw-3.3.2)			#window oppener
 add_subdirectory(external-dependencies/glad)				#opengl loader
@@ -27,7 +26,7 @@ add_subdirectory(external-dependencies/imgui-docking)		#ui
 
 #MY_SOURCES list of all source files .cpp for Simulation
 #MACRO
-file(GLOB_RECURSE MY_SOURCES CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB_RECURSE MY_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/homebrew/opt/llvm/include")
 #set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/opt/llvm/lib -Wl,-rpath,/opt/homebrew/opt/llvm/lib")
 set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
@@ -79,15 +78,15 @@ target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE
     ${OPENGL_LIBRARIES} 
     ${GLEW_LIBRARIES} 
    #${GLFW_LIBRARIES}
-   glfw
-   glm
-   glad
-   stb_image
-   stb_truetype
-   gl2d
-   raudio
-   imgui
-   safeSave
-   profilerLib
-   glui
+    glfw
+    glm
+    glad
+    stb_image
+    stb_truetype
+    gl2d
+    raudio
+    imgui
+    safeSave
+    profilerLib
+    glui
 )
