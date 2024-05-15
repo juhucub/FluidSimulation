@@ -27,18 +27,14 @@ add_subdirectory(external-dependencies/stb_truetype)		#loading ttf files
 add_subdirectory(external-dependencies/glm)				#math
 add_subdirectory(external-dependencies/imgui-docking)		#ui
 
-
 #MY_SOURCES list of all source files .cpp for Simulation
 #MACRO
 file(GLOB_RECURSE MY_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/opt/homebrew/opt/llvm/include")
-#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/homebrew/opt/llvm/lib -Wl,-rpath,/opt/homebrew/opt/llvm/lib")
 set(GLEW_INCLUDE_DIRS "/opt/homebrew/include")
 set(GLEW_LIBRARIES "/opt/homebrew/lib/libGLEW.dylib")
-# Find packages
-#Locate OpenGL, GLEW, and GLFW libraries on system
+
+#Locate OpenGL and GLFW libraries on system
 find_package(OpenGL REQUIRED)
-#find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
 
 #####add_executable(FluidSimulation main.cpp)
@@ -53,16 +49,16 @@ else()
     #get an ASSETS_PATH in IDE during development
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
 	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0) 
-
 endif()
 
-#target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
-
-
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-    ${OPENGL_INCLUDE_DIR} 
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/external-dependencies/imgui-docking/imgui"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external-dependencies/imgui-docking/imgui/backends"
+    ${OPENGL_INCLUDE_DIR}
 )
+
+#FIXME: THE ERROR MAKES IT SO THAT IT DOESNT RECOGNIZE IMGUI FILE, DROP IMGUI FILE INTO FILE IMGUI-DOCKING
 
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE
     ${OPENGL_LIBRARIES} 

@@ -5,24 +5,19 @@
 #include <vector>
 #include "demoShader.h"
 
-const float gravity = 0.98f;
 const float boundaryTop = 1.0f;
 const float boundaryBottom = -1.0f;
 const float boundaryLeft = -1.0f;
 const float boundaryRight = 1.0f;
 
 Circle::Circle(float x, float y, float radius, glm::vec3 color)
-    : position(x, y), radius(radius), color(color), velocity(0.0f, 0.0f), dampingFactor(0.9f) {
+    : position(x, y), radius(radius), color(color), velocity(0.0f, 0.0f), dampingFactor(0.9f), gravity(0.98f) {
         initRenderData();
     }
 
 Circle::~Circle() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-}
-
-void Circle::applyGravity(float deltaTime) {
-    velocity.y -= gravity * deltaTime;
 }
 
 void Circle::keepInBounds() {
@@ -100,6 +95,27 @@ void Circle::draw(const Shader &shader) {
     glUniform3fv(shader.getUniform("circleColor"), 1, &color[0]);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_LINE_LOOP, 0, 100);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 102);
     glBindVertexArray(0);
+}
+
+void Circle::setGravity(float g) {
+    gravity = g;
+}
+
+void Circle::setCollisionDampening(float d) {
+    dampingFactor = d;
+}
+
+void Circle::setRadius(float r) {
+    radius = r;
+    initRenderData(); // Reinitialize render data with new radius
+}
+
+void Circle::setColor(const glm::vec3& c) {
+    color = c;
+}
+
+void Circle::applyGravity(float deltaTime) {
+    velocity.y -= gravity * deltaTime;
 }

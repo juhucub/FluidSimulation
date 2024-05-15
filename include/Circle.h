@@ -11,11 +11,17 @@ public:
     void initRenderData();
     void draw(const Shader &shader);
 
+    void setGravity(float gravity);
+    void setCollisionDampening(float d);
+    void setRadius(float radius);
+    void setColor(const glm::vec3& color);
+
     glm::vec2 position;
     float radius;
     glm::vec3 color;
     glm::vec2 velocity;
     float dampingFactor;
+    float gravity;
 
 private:
     void applyGravity(float deltaTime);

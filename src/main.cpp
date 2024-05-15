@@ -1,6 +1,9 @@
 #define GLFW_INCLUDE_NONE
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <openglDebug.h>
 #include <demoShader.h>
 #include <iostream>
@@ -48,6 +51,13 @@ void glfwErrorCallback(int error, const char* description) {
     std::cerr << "GLFW Error " << error << ": " << description << std::endl;
 }
 
+// Global variables for ImGui sliders
+float gravity = 0.98f;
+float collisionDampening = 0.9f;
+float particleSize = 0.1f;
+float boundarySize = 1.0f;
+float color[3] = {0.0f, 0.0f, 1.0f};
+
 int main(void)
 {
     glfwSetErrorCallback(glfwErrorCallback);
@@ -67,7 +77,6 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-   // glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
     std::cerr << "After window hints for macOS" << std::endl;
 
     /* Create a windowed mode window and its OpenGL context */
@@ -114,10 +123,19 @@ int main(void)
 	    s.bind();
 
         
-        Circle circle(0.0f, 0.0f, 0.1f, glm::vec3(1.0f, 0.0f, 0.0f));   //red circ
-        circle.initRenderData();
+    Circle circle(0.0f, 0.0f, 0.1f, glm::vec3(0.0f, 0.0f, 1.0f));   //red circ
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 410");
 
     std::cerr << "After shader" << std::endl;
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -129,10 +147,32 @@ int main(void)
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        //I'm using the old pipeline here just to test, you shouldn't learn this,
-		//Also It might not work on apple
+        // Start the ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+         // Create ImGui window
+        ImGui::Begin("Simulation Controls");
+        ImGui::SliderFloat("Gravity", &gravity, 0.0f, 20.0f);
+        ImGui::SliderFloat("Collision Dampening", &collisionDampening, 0.0f, 1.0f);
+        ImGui::SliderFloat("Particle Size", &particleSize, 0.01f, 0.5f);
+        ImGui::SliderFloat("Boundary Size", &boundarySize, 0.1f, 2.0f);
+        ImGui::End();
+
+        //Update circle with ImGui-parameters
+        circle.setGravity(gravity);
+        circle.setCollisionDampening(collisionDampening);
+        circle.setRadius(particleSize);
+        circle.setColor(glm::vec3(color[0], color[1], color[2]));
+
 		circle.update(0.016f);
         circle.draw(s);
+
+    
+        // Render ImGui
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -140,6 +180,10 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
+     // Cleanup ImGui
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     //there is no need to call the clear function for the libraries since the os will do that for us.
 	//by calling this functions we are just wasting time.
 	
