@@ -50,7 +50,6 @@ add_executable("${CMAKE_PROJECT_NAME}" ${MY_SOURCES})
 
 #Ensures C++ version is standard
 set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 17)
-set_property(TARGET "${CMAKE_PROJECT_NAME}" PUBLIC GLFW_INLUDE_NONE=1)
 
 if(PRODUCTION_BUILD)
     #ASSETS_PATH macro to be in the root folder of exe
@@ -66,7 +65,7 @@ endif()
 
 #target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
 
-    set_property()
+
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include/"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/gameLayer/"
