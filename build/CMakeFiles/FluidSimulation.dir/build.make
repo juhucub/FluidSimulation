@@ -69,10 +69,24 @@ include CMakeFiles/FluidSimulation.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/FluidSimulation.dir/flags.make
 
+CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o: CMakeFiles/FluidSimulation.dir/flags.make
+CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o: /Users/jacobgardner/Documents/FluidSimulation/src/Circle.cpp
+CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o: CMakeFiles/FluidSimulation.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o -MF CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o.d -o CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/Circle.cpp
+
+CMakeFiles/FluidSimulation.dir/src/Circle.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/FluidSimulation.dir/src/Circle.cpp.i"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/jacobgardner/Documents/FluidSimulation/src/Circle.cpp > CMakeFiles/FluidSimulation.dir/src/Circle.cpp.i
+
+CMakeFiles/FluidSimulation.dir/src/Circle.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/FluidSimulation.dir/src/Circle.cpp.s"
+	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/jacobgardner/Documents/FluidSimulation/src/Circle.cpp -o CMakeFiles/FluidSimulation.dir/src/Circle.cpp.s
+
 CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o: CMakeFiles/FluidSimulation.dir/flags.make
 CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o: /Users/jacobgardner/Documents/FluidSimulation/src/demoShader.cpp
 CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o: CMakeFiles/FluidSimulation.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o"
 	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o -MF CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o.d -o CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/demoShader.cpp
 
 CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.i: cmake_force
@@ -86,7 +100,7 @@ CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.s: cmake_force
 CMakeFiles/FluidSimulation.dir/src/main.cpp.o: CMakeFiles/FluidSimulation.dir/flags.make
 CMakeFiles/FluidSimulation.dir/src/main.cpp.o: /Users/jacobgardner/Documents/FluidSimulation/src/main.cpp
 CMakeFiles/FluidSimulation.dir/src/main.cpp.o: CMakeFiles/FluidSimulation.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/FluidSimulation.dir/src/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/FluidSimulation.dir/src/main.cpp.o"
 	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/FluidSimulation.dir/src/main.cpp.o -MF CMakeFiles/FluidSimulation.dir/src/main.cpp.o.d -o CMakeFiles/FluidSimulation.dir/src/main.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/main.cpp
 
 CMakeFiles/FluidSimulation.dir/src/main.cpp.i: cmake_force
@@ -100,7 +114,7 @@ CMakeFiles/FluidSimulation.dir/src/main.cpp.s: cmake_force
 CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o: CMakeFiles/FluidSimulation.dir/flags.make
 CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o: /Users/jacobgardner/Documents/FluidSimulation/src/openglDebug.cpp
 CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o: CMakeFiles/FluidSimulation.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o"
 	/usr/bin/clang++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o -MF CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o.d -o CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/openglDebug.cpp
 
 CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.i: cmake_force
@@ -113,6 +127,7 @@ CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.s: cmake_force
 
 # Object files for target FluidSimulation
 FluidSimulation_OBJECTS = \
+"CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o" \
 "CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o" \
 "CMakeFiles/FluidSimulation.dir/src/main.cpp.o" \
 "CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o"
@@ -120,6 +135,7 @@ FluidSimulation_OBJECTS = \
 # External object files for target FluidSimulation
 FluidSimulation_EXTERNAL_OBJECTS =
 
+FluidSimulation: CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o
 FluidSimulation: CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o
 FluidSimulation: CMakeFiles/FluidSimulation.dir/src/main.cpp.o
 FluidSimulation: CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o
@@ -132,7 +148,7 @@ FluidSimulation: external-dependencies/imgui-docking/libimgui.a
 FluidSimulation: external-dependencies/glfw-3.4/src/libglfw3.a
 FluidSimulation: external-dependencies/glad/libglad.a
 FluidSimulation: CMakeFiles/FluidSimulation.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable FluidSimulation"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable FluidSimulation"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/FluidSimulation.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -1,16 +1,25 @@
-#include "Circle.h"
-#include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 
-const float gravity = 9.8f;
+#include "Circle.h"
+#include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <vector>
+#include "demoShader.h"
+
+const float gravity = 0.98f;
 const float boundaryTop = 1.0f;
 const float boundaryBottom = -1.0f;
 const float boundaryLeft = -1.0f;
 const float boundaryRight = 1.0f;
 
 Circle::Circle(float x, float y, float radius, glm::vec3 color)
-    : position(x, y), radius(radius), color(color), velocity(0.0f, 0.0f) {}
+    : position(x, y), radius(radius), color(color), velocity(0.0f, 0.0f), dampingFactor(0.9f) {
+        initRenderData();
+    }
+
+Circle::~Circle() {
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+}
 
 void Circle::applyGravity(float deltaTime) {
     velocity.y -= gravity * deltaTime;
@@ -19,19 +28,19 @@ void Circle::applyGravity(float deltaTime) {
 void Circle::keepInBounds() {
     if (position.y - radius < boundaryBottom) {
         position.y = boundaryBottom + radius;
-        velocity.y *= -1; // Invert velocity to bounce
+        velocity.y *= -dampingFactor; // Invert velocity to bounce
     }
     if (position.y + radius > boundaryTop) {
         position.y = boundaryTop - radius;
-        velocity.y *= -1;
+        velocity.y *= -dampingFactor;
     }
     if (position.x - radius < boundaryLeft) {
         position.x = boundaryLeft + radius;
-        velocity.x *= -1;
+        velocity.x *= -dampingFactor;
     }
     if (position.x + radius > boundaryRight) {
         position.x = boundaryRight - radius;
-        velocity.x *= -1;
+        velocity.x *= -dampingFactor;
     }
 }
 
@@ -41,20 +50,20 @@ void Circle::update(float deltaTime) {
     keepInBounds();
 }
 
-void Circle::draw() {
+void Circle::initRenderData() {
     const int numSegments = 100;
     float theta = 2 * 3.1415926f / float(numSegments);
     float tangetialFactor = tanf(theta);
     float radialFactor = cosf(theta);
 
     float x = radius;
-    float y = 0;
+    float y = 0.0f;
 
-    glBegin(GL_LINE_LOOP);
-    glColor3f(color.r, color.g, color.b);
+    std::vector<float> vertices;
 
     for(int i = 0; i < numSegments; i++) {
-        glVertex2f(x + position.x, y + position.y);
+        vertices.push_back(x);
+        vertices.push_back(y);
 
         float tx = -y;
         float ty = x;
@@ -66,5 +75,31 @@ void Circle::draw() {
         y *= radialFactor;
     }
 
-    glEnd();
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void Circle::draw(const Shader &shader) {
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
+    glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+
+    shader.bind();
+    glUniformMatrix4fv(shader.getUniform("model"), 1, GL_FALSE, &model[0][0]);
+    glUniformMatrix4fv(shader.getUniform("projection"), 1, GL_FALSE, &projection[0][0]);
+    glUniform3fv(shader.getUniform("circleColor"), 1, &color[0]);
+
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_LINE_LOOP, 0, 100);
+    glBindVertexArray(0);
 }

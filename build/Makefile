@@ -207,6 +207,30 @@ imgui/fast:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build
 .PHONY : imgui/fast
 
+src/Circle.o: src/Circle.cpp.o
+.PHONY : src/Circle.o
+
+# target to build an object file
+src/Circle.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o
+.PHONY : src/Circle.cpp.o
+
+src/Circle.i: src/Circle.cpp.i
+.PHONY : src/Circle.i
+
+# target to preprocess a source file
+src/Circle.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Circle.cpp.i
+.PHONY : src/Circle.cpp.i
+
+src/Circle.s: src/Circle.cpp.s
+.PHONY : src/Circle.s
+
+# target to generate assembly for a file
+src/Circle.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Circle.cpp.s
+.PHONY : src/Circle.cpp.s
+
 src/demoShader.o: src/demoShader.cpp.o
 .PHONY : src/demoShader.o
 
@@ -294,6 +318,9 @@ help:
 	@echo "... imgui"
 	@echo "... stb_image"
 	@echo "... stb_truetype"
+	@echo "... src/Circle.o"
+	@echo "... src/Circle.i"
+	@echo "... src/Circle.s"
 	@echo "... src/demoShader.o"
 	@echo "... src/demoShader.i"
 	@echo "... src/demoShader.s"

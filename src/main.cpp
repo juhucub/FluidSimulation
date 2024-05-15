@@ -101,7 +101,6 @@ int main(void)
                 std::cerr << "2" << std::endl;
     #pragma endregion
 
-
      std::cerr << "Before shader" << std::endl;
 
     //FIXME: Shader Loading PRIMAL 
@@ -113,6 +112,10 @@ int main(void)
             return -1;
          }
 	    s.bind();
+
+        
+        Circle circle(0.0f, 0.0f, 0.1f, glm::vec3(1.0f, 0.0f, 0.0f));   //red circ
+        circle.initRenderData();
 
     std::cerr << "After shader" << std::endl;
     /* Loop until the user closes the window */
@@ -128,14 +131,8 @@ int main(void)
 
         //I'm using the old pipeline here just to test, you shouldn't learn this,
 		//Also It might not work on apple
-		glBegin(GL_TRIANGLES);
-		glColor3f(1, 0, 0);
-		glVertex2f(0,1);
-		glColor3f(0, 1, 0);
-		glVertex2f(1,-1);
-		glColor3f(0, 0, 1);
-		glVertex2f(-1,-1);
-		glEnd();
+		circle.update(0.016f);
+        circle.draw(s);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

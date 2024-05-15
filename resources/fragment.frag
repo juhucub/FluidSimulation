@@ -1,11 +1,12 @@
-#version 330 core
+#version 410 core
 
-layout (location = 0) out vec4 color;
+out vec4 color;
 
+uniform vec3 circleColor;
 
 void main()
 {
 	
-	color = vec4(1,0,0,1);
+	color = vec4(circleColor, 1.0);
 
 }

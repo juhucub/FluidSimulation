@@ -1,23 +1,29 @@
 #pragma once
 #include <glad/glad.h>
+#include <string>
 
-struct Shader
-{
-	GLuint id = 0;
+class Shader {
+public:
+    Shader();
+    ~Shader();
 
-	bool loadShaderProgramFromData(const char *vertexShaderData, const char *fragmentShaderData);
-	bool loadShaderProgramFromData(const char *vertexShaderData,
-		const char *geometryShaderData, const char *fragmentShaderData);
+    bool loadShaderProgramFromData(const char *vertexShaderData, const char *fragmentShaderData);
+    bool loadShaderProgramFromData(const char *vertexShaderData, const char *geometryShaderData, const char *fragmentShaderData);
+    bool loadShaderProgramFromFile(const char *vertexShaderPath, const char *fragmentShaderPath);
+    bool loadShaderProgramFromFile(const char *vertexShaderPath, const char *geometryShaderPath, const char *fragmentShaderPath);
 
-	bool loadShaderProgramFromFile(const char *vertexShader, const char *fragmentShader);
-	bool loadShaderProgramFromFile(const char *vertexShader,
-		const char *geometryShader, const char *fragmentShader);
+    void bind() const;
+    void clear();
 
-	void bind();
+    GLint getUniform(const char *name) const;
+    GLuint getProgramID() const;
 
-	void clear();
+private:
+    GLuint id;
 
-	GLint getUniform(const char *name);
+    bool compileShader(GLuint shader, const char *source, const std::string &shaderType);
+    bool linkProgram(GLuint vertexShader, GLuint fragmentShader, GLuint geometryShader = 0);
+    std::string readShaderFile(const char *filePath);
 };
 
 GLint getUniform(GLuint shaderId, const char *name);

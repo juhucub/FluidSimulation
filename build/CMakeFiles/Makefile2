@@ -208,12 +208,12 @@ CMakeFiles/FluidSimulation.dir/all: external-dependencies/stb_truetype/CMakeFile
 CMakeFiles/FluidSimulation.dir/all: external-dependencies/imgui-docking/CMakeFiles/imgui.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=1,2,3,4 "Built target FluidSimulation"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target FluidSimulation"
 .PHONY : CMakeFiles/FluidSimulation.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/FluidSimulation.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles 40
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles 41
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/FluidSimulation.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles 0
 .PHONY : CMakeFiles/FluidSimulation.dir/rule
@@ -234,7 +234,7 @@ CMakeFiles/FluidSimulation.dir/clean:
 external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/all:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/build.make external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/depend
 	$(MAKE) $(MAKESILENT) -f external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/build.make external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28 "Built target glfw"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29 "Built target glfw"
 .PHONY : external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/all
 
 # Build rule for subdir invocation for target.
@@ -260,7 +260,7 @@ external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/clean:
 external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/all:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/build.make external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/depend
 	$(MAKE) $(MAKESILENT) -f external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/build.make external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=41 "Built target update_mappings"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=42 "Built target update_mappings"
 .PHONY : external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/all
 
 # Build rule for subdir invocation for target.
@@ -286,7 +286,7 @@ external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/clean:
 external-dependencies/glad/CMakeFiles/glad.dir/all:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/glad/CMakeFiles/glad.dir/build.make external-dependencies/glad/CMakeFiles/glad.dir/depend
 	$(MAKE) $(MAKESILENT) -f external-dependencies/glad/CMakeFiles/glad.dir/build.make external-dependencies/glad/CMakeFiles/glad.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=5,6 "Built target glad"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=6,7 "Built target glad"
 .PHONY : external-dependencies/glad/CMakeFiles/glad.dir/all
 
 # Build rule for subdir invocation for target.
@@ -312,7 +312,7 @@ external-dependencies/glad/CMakeFiles/glad.dir/clean:
 external-dependencies/stb_image/CMakeFiles/stb_image.dir/all:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/stb_image/CMakeFiles/stb_image.dir/build.make external-dependencies/stb_image/CMakeFiles/stb_image.dir/depend
 	$(MAKE) $(MAKESILENT) -f external-dependencies/stb_image/CMakeFiles/stb_image.dir/build.make external-dependencies/stb_image/CMakeFiles/stb_image.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=37,38 "Built target stb_image"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=38,39 "Built target stb_image"
 .PHONY : external-dependencies/stb_image/CMakeFiles/stb_image.dir/all
 
 # Build rule for subdir invocation for target.
@@ -338,7 +338,7 @@ external-dependencies/stb_image/CMakeFiles/stb_image.dir/clean:
 external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/all:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/depend
 	$(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=39,40 "Built target stb_truetype"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=40,41 "Built target stb_truetype"
 .PHONY : external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/all
 
 # Build rule for subdir invocation for target.
@@ -365,7 +365,7 @@ external-dependencies/imgui-docking/CMakeFiles/imgui.dir/all: external-dependenc
 external-dependencies/imgui-docking/CMakeFiles/imgui.dir/all: external-dependencies/glad/CMakeFiles/glad.dir/all
 	$(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/depend
 	$(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=29,30,31,32,33,34,35,36 "Built target imgui"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=30,31,32,33,34,35,36,37 "Built target imgui"
 .PHONY : external-dependencies/imgui-docking/CMakeFiles/imgui.dir/all
 
 # Build rule for subdir invocation for target.
