@@ -1,99 +1,147 @@
 [
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build",
-  "command": "/usr/bin/clang++ -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"/Users/jacobgardner/Documents/FluidSimulation/resources/\\\" -I/Users/jacobgardner/Documents/FluidSimulation/include -I/Users/jacobgardner/Documents/FluidSimulation/include/gameLayer -I/Users/jacobgardner/Documents/FluidSimulation/include/platform -F/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/System/Library/Frameworks -I/opt/homebrew/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -g -std=gnu++17 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/FluidSimulation.dir/src/main.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/main.cpp",
+  "command": "/usr/bin/clang++ -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"/Users/jacobgardner/Documents/FluidSimulation/resources/\\\" -I/Users/jacobgardner/Documents/FluidSimulation/include -F/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/System/Library/Frameworks -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -g -std=gnu++17 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/demoShader.cpp",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/src/demoShader.cpp",
+  "output": "CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build",
+  "command": "/usr/bin/clang++ -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"/Users/jacobgardner/Documents/FluidSimulation/resources/\\\" -I/Users/jacobgardner/Documents/FluidSimulation/include -F/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/System/Library/Frameworks -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -g -std=gnu++17 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/FluidSimulation.dir/src/main.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/main.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/src/main.cpp",
   "output": "CMakeFiles/FluidSimulation.dir/src/main.cpp.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/context.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/context.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/context.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/context.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build",
+  "command": "/usr/bin/clang++ -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\\\"/Users/jacobgardner/Documents/FluidSimulation/resources/\\\" -I/Users/jacobgardner/Documents/FluidSimulation/include -F/Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/System/Library/Frameworks -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glm -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -g -std=gnu++17 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/src/openglDebug.cpp",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/src/openglDebug.cpp",
+  "output": "CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/init.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/init.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/init.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/init.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/context.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/context.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/context.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/context.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/input.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/input.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/input.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/input.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/init.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/init.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/init.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/init.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/monitor.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/monitor.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/monitor.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/monitor.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/input.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/input.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/input.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/input.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/vulkan.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/vulkan.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/vulkan.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/vulkan.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/monitor.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/monitor.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/monitor.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/monitor.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/window.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/window.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/window.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/window.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/platform.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/platform.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/platform.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/platform.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_init.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_init.m",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_init.m",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/cocoa_init.m.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/vulkan.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/vulkan.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/vulkan.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/vulkan.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_joystick.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_joystick.m",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_joystick.m",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/window.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/window.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/window.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/window.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_monitor.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_monitor.m",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_monitor.m",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/egl_context.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/egl_context.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/egl_context.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/egl_context.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_window.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_window.m",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_window.m",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/cocoa_window.m.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/osmesa_context.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/osmesa_context.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/osmesa_context.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/osmesa_context.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_time.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_time.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/cocoa_time.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/cocoa_time.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/null_init.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_init.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_init.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/null_init.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/posix_thread.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/posix_thread.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/posix_thread.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/posix_thread.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/null_monitor.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_monitor.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_monitor.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/null_monitor.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/nsgl_context.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/nsgl_context.m",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/nsgl_context.m",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/nsgl_context.m.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/null_window.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_window.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_window.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/null_window.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/egl_context.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/egl_context.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/egl_context.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/egl_context.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/null_joystick.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_joystick.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/null_joystick.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/null_joystick.c.o"
 },
 {
-  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src",
-  "command": "/usr/bin/clang -D_GLFW_USE_CONFIG_H -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/src -g -std=gnu99 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -Wdeclaration-after-statement -o CMakeFiles/glfw.dir/osmesa_context.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/osmesa_context.c",
-  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/src/osmesa_context.c",
-  "output": "external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/osmesa_context.c.o"
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_time.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_time.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_time.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/cocoa_time.c.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/posix_module.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/posix_module.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/posix_module.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/posix_module.c.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/posix_thread.c.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/posix_thread.c",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/posix_thread.c",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/posix_thread.c.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_init.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_init.m",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_init.m",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/cocoa_init.m.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_joystick.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_joystick.m",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_joystick.m",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/cocoa_joystick.m.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_monitor.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_monitor.m",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_monitor.m",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/cocoa_monitor.m.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/cocoa_window.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_window.m",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/cocoa_window.m",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/cocoa_window.m.o"
+},
+{
+  "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src",
+  "command": "/usr/bin/clang -D_GLFW_COCOA -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src -I/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/src -g -std=c99 -flto=thin -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -fPIC -Wall -o CMakeFiles/glfw.dir/nsgl_context.m.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/nsgl_context.m",
+  "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src/nsgl_context.m",
+  "output": "external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/nsgl_context.m.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glad",
@@ -103,55 +151,55 @@
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/stb_image",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/stb_image.dir/src/stb_image.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/src/stb_image.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/stb_image.dir/src/stb_image.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/src/stb_image.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_image/src/stb_image.cpp",
   "output": "external-dependencies/stb_image/CMakeFiles/stb_image.dir/src/stb_image.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/stb_truetype",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/src/stb_truetype.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/src/stb_truetype.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/stb_truetype/src/stb_truetype.cpp",
   "output": "external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui.cpp",
   "output": "external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_demo.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_demo.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_demo.cpp",
   "output": "external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_draw.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_draw.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_draw.cpp",
   "output": "external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_tables.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_tables.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_tables.cpp",
   "output": "external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_widgets.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_widgets.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/imgui_widgets.cpp",
   "output": "external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/backends/imgui_impl_glfw.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/backends/imgui_impl_glfw.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/backends/imgui_impl_glfw.cpp",
   "output": "external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.o"
 },
 {
   "directory": "/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking",
-  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/backends/imgui_impl_opengl3.cpp",
+  "command": "/usr/bin/clang++  -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk -o CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.o -c /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/backends/imgui_impl_opengl3.cpp",
   "file": "/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui/backends/imgui_impl_opengl3.cpp",
   "output": "external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.o"
 }

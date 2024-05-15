@@ -4,9 +4,9 @@
 # compile CXX with /usr/bin/clang++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.3.2/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include
+CXX_INCLUDES = -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glad/include
 
-CXX_FLAGSarm64 = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+CXX_FLAGSarm64 = -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
 
-CXX_FLAGS = -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+CXX_FLAGS = -g -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
 

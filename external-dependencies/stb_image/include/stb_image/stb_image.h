@@ -344,13 +344,13 @@ inline void *STBIMAGE_CUSTOM_REALOC(void *p, size_t oldSize, size_t newsz)
 
 	std::memcpy(newPtr, p, oldSize);
 
-	delete[] p;
+	free(p);
 	return newPtr;
 };
 
 #define STBI_MALLOC(sz)           new char[(sz)]
 #define STBI_REALLOC_SIZED(p, oldsz, newsz) STBIMAGE_CUSTOM_REALOC((p), (oldsz), (newsz))
-#define STBI_FREE(p)              delete[] (p)
+#define STBI_FREE(p)              free(p)
 
 
 

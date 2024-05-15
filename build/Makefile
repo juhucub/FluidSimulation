@@ -139,8 +139,21 @@ glfw: cmake_check_build_system
 
 # fast build rule for target.
 glfw/fast:
-	$(MAKE) $(MAKESILENT) -f external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/build.make external-dependencies/glfw-3.3.2/src/CMakeFiles/glfw.dir/build
+	$(MAKE) $(MAKESILENT) -f external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/build.make external-dependencies/glfw-3.4/src/CMakeFiles/glfw.dir/build
 .PHONY : glfw/fast
+
+#=============================================================================
+# Target rules for targets named update_mappings
+
+# Build rule for target.
+update_mappings: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 update_mappings
+.PHONY : update_mappings
+
+# fast build rule for target.
+update_mappings/fast:
+	$(MAKE) $(MAKESILENT) -f external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/build.make external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/build
+.PHONY : update_mappings/fast
 
 #=============================================================================
 # Target rules for targets named glad
@@ -194,6 +207,30 @@ imgui/fast:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build
 .PHONY : imgui/fast
 
+src/demoShader.o: src/demoShader.cpp.o
+.PHONY : src/demoShader.o
+
+# target to build an object file
+src/demoShader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o
+.PHONY : src/demoShader.cpp.o
+
+src/demoShader.i: src/demoShader.cpp.i
+.PHONY : src/demoShader.i
+
+# target to preprocess a source file
+src/demoShader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.i
+.PHONY : src/demoShader.cpp.i
+
+src/demoShader.s: src/demoShader.cpp.s
+.PHONY : src/demoShader.s
+
+# target to generate assembly for a file
+src/demoShader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.s
+.PHONY : src/demoShader.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -218,6 +255,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/openglDebug.o: src/openglDebug.cpp.o
+.PHONY : src/openglDebug.o
+
+# target to build an object file
+src/openglDebug.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o
+.PHONY : src/openglDebug.cpp.o
+
+src/openglDebug.i: src/openglDebug.cpp.i
+.PHONY : src/openglDebug.i
+
+# target to preprocess a source file
+src/openglDebug.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.i
+.PHONY : src/openglDebug.cpp.i
+
+src/openglDebug.s: src/openglDebug.cpp.s
+.PHONY : src/openglDebug.s
+
+# target to generate assembly for a file
+src/openglDebug.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.s
+.PHONY : src/openglDebug.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -226,15 +287,22 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... update_mappings"
 	@echo "... FluidSimulation"
 	@echo "... glad"
 	@echo "... glfw"
 	@echo "... imgui"
 	@echo "... stb_image"
 	@echo "... stb_truetype"
+	@echo "... src/demoShader.o"
+	@echo "... src/demoShader.i"
+	@echo "... src/demoShader.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/openglDebug.o"
+	@echo "... src/openglDebug.i"
+	@echo "... src/openglDebug.s"
 .PHONY : help
 
 

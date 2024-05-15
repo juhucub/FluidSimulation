@@ -5,18 +5,22 @@
 cmake_minimum_required(VERSION 3.20.2)
 project(FluidSimulation)
 
+#Ensures C++ version is standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 #PRovent GFLW from building unecessary components
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
-option(PRODUCTION_BUILD " MAKE BUILD" OFF)
+option(PRODUCTION_BUILD "MAKE BUILD" OFF)
 
 #link time optimization
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) 
 
-add_subdirectory(external-dependencies/glfw-3.3.2)			#window oppener
+add_subdirectory(external-dependencies/glfw-3.4)			#window oppener
 add_subdirectory(external-dependencies/glad)				#opengl loader
 add_subdirectory(external-dependencies/stb_image)			#loading immaged
 add_subdirectory(external-dependencies/stb_truetype)		#loading ttf files
@@ -37,18 +41,8 @@ find_package(OpenGL REQUIRED)
 #find_package(GLEW REQUIRED)
 find_package(PkgConfig REQUIRED)
 
-#set(GLFW_INCLUDE_DIRS "/usr/local/include")
-#set(GLFW_LIBRARY_DIRS "/usr/local/lib")
-#set(GLFW_LIBRARIES "glfw")
-
-
-
-
 #####add_executable(FluidSimulation main.cpp)
 add_executable("${CMAKE_PROJECT_NAME}" ${MY_SOURCES})
-
-#Ensures C++ version is standard
-set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 17)
 
 if(PRODUCTION_BUILD)
     #ASSETS_PATH macro to be in the root folder of exe
@@ -67,26 +61,15 @@ endif()
 
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/gameLayer/"
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/platform/"
     ${OPENGL_INCLUDE_DIR} 
-    ${GLEW_INCLUDE_DIRS} 
-    ${GLFW_INCLUDE_DIRS}
 )
 
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE
     ${OPENGL_LIBRARIES} 
-    ${GLEW_LIBRARIES} 
-   #${GLFW_LIBRARIES}
     glfw
-    glm
     glad
+    glm
     stb_image
     stb_truetype
-    gl2d
-    raudio
     imgui
-    safeSave
-    profilerLib
-    glui
 )

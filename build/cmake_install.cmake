@@ -39,7 +39,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.3.2/cmake_install.cmake")
+  include("/Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/glfw-3.4/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
