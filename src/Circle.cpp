@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <random>
 #include "demoShader.h"
 
 const float boundaryTop = 1.0f;
@@ -10,8 +11,25 @@ const float boundaryBottom = -1.0f;
 const float boundaryLeft = -1.0f;
 const float boundaryRight = 1.0f;
 
-Circle::Circle(float x, float y, float radius, glm::vec3 color)
-    : position(x, y), radius(radius), color(color), velocity(0.0f, 0.0f), dampingFactor(0.9f), gravity(0.98f) {
+Circle::Circle(int numParticles, float radius, glm::vec3 color)
+    : radius(radius), color(color), gravity(0.98f), dampingFactor(0.9f) {
+        positions.resize(numParticles);
+        velocities.resize(numParticles, glm::vec2(0.0f, 0.0f));
+
+        //initialize particles in a grid 
+        int gridSize = static_cast<int>(sqrt(numParticles));
+        float spacing = radius * 2.5f;
+        int index = 0;
+
+        for(int i = 0; i < gridSize; i++) {
+            for(int j = 0; j < gridSize; j++) {
+                if(index < numParticles) {
+                    positions[index] = glm::vec2{i * spacing - 1.0f, j * spacing - 1.0f};
+                    index++;
+                }
+            }
+        }
+        
         initRenderData();
     }
 
@@ -21,27 +39,55 @@ Circle::~Circle() {
 }
 
 void Circle::keepInBounds() {
-    if (position.y - radius < boundaryBottom) {
-        position.y = boundaryBottom + radius;
-        velocity.y *= -dampingFactor; // Invert velocity to bounce
+    for (size_t i = 0; i < positions.size(); ++i) {
+        if (positions[i].y - radius < boundaryBottom) {
+            positions[i].y = boundaryBottom + radius;
+            velocities[i].y *= -dampingFactor; // Invert velocity to bounce
+        }
+        if (positions[i].y + radius > boundaryTop) {
+            positions[i].y = boundaryTop - radius;
+            velocities[i].y *= -dampingFactor;
+        }
+        if (positions[i].x - radius < boundaryLeft) {
+            positions[i].x = boundaryLeft + radius;
+            velocities[i].x *= -dampingFactor;
+        }
+        if (positions[i].x + radius > boundaryRight) {
+            positions[i].x = boundaryRight - radius;
+            velocities[i].x *= -dampingFactor;
+        }
     }
-    if (position.y + radius > boundaryTop) {
-        position.y = boundaryTop - radius;
-        velocity.y *= -dampingFactor;
-    }
-    if (position.x - radius < boundaryLeft) {
-        position.x = boundaryLeft + radius;
-        velocity.x *= -dampingFactor;
-    }
-    if (position.x + radius > boundaryRight) {
-        position.x = boundaryRight - radius;
-        velocity.x *= -dampingFactor;
+}
+
+void Circle::handleCollisions() {
+    for (size_t i = 0; i < positions.size(); ++i) {
+        for (size_t j = i + 1; j < positions.size(); ++j) {
+            glm::vec2 diff = positions[i] - positions[j];
+            float dist2 = glm::dot(diff, diff);
+            float minDist = radius * 2.0f;
+
+            if (dist2 < minDist * minDist) {
+                float dist = sqrt(dist2);
+                glm::vec2 correction = (minDist - dist) * (diff / dist) * 0.01f;
+                positions[i] += correction;
+                positions[j] -= correction;
+
+                glm::vec2 relativeVelocity = velocities[i] - velocities[j];
+                float rvDotDiff = glm::dot(relativeVelocity, diff / dist);
+                glm::vec2 impulse = (rvDotDiff / dist) * diff / dist;
+                velocities[i] -= impulse;
+                velocities[j] += impulse;
+            }
+        }
     }
 }
 
 void Circle::update(float deltaTime) {
     applyGravity(deltaTime);
-    position += velocity * deltaTime;
+    for (size_t i = 0; i < positions.size(); ++i) {
+        positions[i] += velocities[i] * deltaTime;
+    }
+    handleCollisions();
     keepInBounds();
 }
 
@@ -86,17 +132,34 @@ void Circle::initRenderData() {
 }
 
 void Circle::draw(const Shader &shader) {
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
     glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
 
     shader.bind();
-    glUniformMatrix4fv(shader.getUniform("model"), 1, GL_FALSE, &model[0][0]);
     glUniformMatrix4fv(shader.getUniform("projection"), 1, GL_FALSE, &projection[0][0]);
     glUniform3fv(shader.getUniform("circleColor"), 1, &color[0]);
 
     glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, 102);
+    for (const auto &position : positions) {
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
+        glUniformMatrix4fv(shader.getUniform("model"), 1, GL_FALSE, &model[0][0]);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 102);
+    }
     glBindVertexArray(0);
+}
+
+void Circle::setNumParticles(int numParticles) {
+    positions.resize(numParticles);
+    velocities.resize(numParticles);
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> disX(boundaryLeft + radius, boundaryRight - radius);
+    std::uniform_real_distribution<> disY(boundaryBottom + radius, boundaryTop - radius);
+
+    for (int i = 0; i < numParticles; ++i) {
+        positions[i] = glm::vec2(disX(gen), disY(gen));
+        velocities[i] = glm::vec2(0.0f, 0.0f);
+    }
 }
 
 void Circle::setGravity(float g) {
@@ -117,5 +180,7 @@ void Circle::setColor(const glm::vec3& c) {
 }
 
 void Circle::applyGravity(float deltaTime) {
-    velocity.y -= gravity * deltaTime;
+    for (auto &velocity : velocities) {
+        velocity.y -= gravity * deltaTime;
+    };
 }
