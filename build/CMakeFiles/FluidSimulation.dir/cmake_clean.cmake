@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/FluidSimulation.dir/src/Blur.cpp.o"
+  "CMakeFiles/FluidSimulation.dir/src/Blur.cpp.o.d"
   "CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o"
   "CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o.d"
   "CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o"

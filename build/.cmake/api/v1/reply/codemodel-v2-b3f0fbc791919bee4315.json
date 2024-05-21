@@ -1,0 +1,292 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						3,
+						4,
+						5,
+						6,
+						7
+					],
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20.2"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "external-dependencies/glfw-3.4",
+					"childIndexes" : 
+					[
+						2
+					],
+					"jsonFile" : "directory-external-dependencies.glfw-3.4-Debug-faae6a5f95ec56a3ba40.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.4"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "external-dependencies/glfw-3.4"
+				},
+				{
+					"build" : "external-dependencies/glfw-3.4/src",
+					"jsonFile" : "directory-external-dependencies.glfw-3.4.src-Debug-658be8e5344155bdef5e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.4"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "external-dependencies/glfw-3.4/src",
+					"targetIndexes" : 
+					[
+						2,
+						6
+					]
+				},
+				{
+					"build" : "external-dependencies/glad",
+					"jsonFile" : "directory-external-dependencies.glad-Debug-48da8d4a94ec9a24a062.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "external-dependencies/glad",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "external-dependencies/stb_image",
+					"jsonFile" : "directory-external-dependencies.stb_image-Debug-e0aeb86459072bcff1e7.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 3,
+					"source" : "external-dependencies/stb_image",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "external-dependencies/stb_truetype",
+					"jsonFile" : "directory-external-dependencies.stb_truetype-Debug-7d930521b5866cf8b91f.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 4,
+					"source" : "external-dependencies/stb_truetype",
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"build" : "external-dependencies/glm",
+					"jsonFile" : "directory-external-dependencies.glm-Debug-ae29b4301eaae736ab13.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 5,
+					"source" : "external-dependencies/glm"
+				},
+				{
+					"build" : "external-dependencies/imgui-docking",
+					"jsonFile" : "directory-external-dependencies.imgui-docking-Debug-7182dc15352e49ae09e0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 6,
+					"source" : "external-dependencies/imgui-docking",
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4,
+						5,
+						6
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "FluidSimulation",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2
+					],
+					"name" : "GLFW",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						2,
+						6
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						3
+					],
+					"name" : "glad",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						4
+					],
+					"name" : "stb_image",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						5
+					],
+					"name" : "stb_truetype",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						6
+					],
+					"name" : "glm",
+					"parentIndex" : 0
+				},
+				{
+					"directoryIndexes" : 
+					[
+						7
+					],
+					"name" : "imgui",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						3
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "FluidSimulation::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-FluidSimulation-Debug-a5ae40a448de48df96a7.json",
+					"name" : "FluidSimulation",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "glad::@bb57f5886e2d3888236e",
+					"jsonFile" : "target-glad-Debug-68b56f8023437517751d.json",
+					"name" : "glad",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "glfw::@06f1e26488fe48b46909",
+					"jsonFile" : "target-glfw-Debug-3689479e281c137cb17b.json",
+					"name" : "glfw",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 7,
+					"id" : "imgui::@71158a3305ade6af5933",
+					"jsonFile" : "target-imgui-Debug-612be1591f60cf040177.json",
+					"name" : "imgui",
+					"projectIndex" : 6
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "stb_image::@8e2ea2c8de72cb81c00c",
+					"jsonFile" : "target-stb_image-Debug-0d59dedc42d5832cd8ab.json",
+					"name" : "stb_image",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "stb_truetype::@5e79b2e11c0cce7df43c",
+					"jsonFile" : "target-stb_truetype-Debug-2c8bcc6c020655a8a78e.json",
+					"name" : "stb_truetype",
+					"projectIndex" : 4
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "update_mappings::@06f1e26488fe48b46909",
+					"jsonFile" : "target-update_mappings-Debug-77b2c4559f4d79fdfbd4.json",
+					"name" : "update_mappings",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/jacobgardner/Documents/FluidSimulation/build",
+		"source" : "/Users/jacobgardner/Documents/FluidSimulation"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
