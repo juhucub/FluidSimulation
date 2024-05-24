@@ -207,30 +207,6 @@ imgui/fast:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build
 .PHONY : imgui/fast
 
-src/Blur.o: src/Blur.cpp.o
-.PHONY : src/Blur.o
-
-# target to build an object file
-src/Blur.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Blur.cpp.o
-.PHONY : src/Blur.cpp.o
-
-src/Blur.i: src/Blur.cpp.i
-.PHONY : src/Blur.i
-
-# target to preprocess a source file
-src/Blur.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Blur.cpp.i
-.PHONY : src/Blur.cpp.i
-
-src/Blur.s: src/Blur.cpp.s
-.PHONY : src/Blur.s
-
-# target to generate assembly for a file
-src/Blur.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Blur.cpp.s
-.PHONY : src/Blur.cpp.s
-
 src/Circle.o: src/Circle.cpp.o
 .PHONY : src/Circle.o
 
@@ -342,9 +318,6 @@ help:
 	@echo "... imgui"
 	@echo "... stb_image"
 	@echo "... stb_truetype"
-	@echo "... src/Blur.o"
-	@echo "... src/Blur.i"
-	@echo "... src/Blur.s"
 	@echo "... src/Circle.o"
 	@echo "... src/Circle.i"
 	@echo "... src/Circle.s"
