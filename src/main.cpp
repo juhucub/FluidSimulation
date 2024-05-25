@@ -115,43 +115,12 @@ int main(void)
          }
 	    s.bind();
 
-        Shader blurShader;
-    if (!blurShader.loadShaderProgramFromFile(RESOURCES_PATH "vertex.vert", RESOURCES_PATH "blur.frag"))
-    {
-        std::cerr << "Failed to load blur shader program" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-
-    // Set up framebuffers for post-processing
-    unsigned int framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    unsigned int textureColorbuffer;
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280, 720, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-
-    unsigned int rbo;
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1280, 720);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
     Circle circle(100, 0.1f, glm::vec3(0.0f, 0.0f, 1.0f));  
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGuiIO const& io = ImGui::GetIO(); (void)io;
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
     // Setup Platform/Renderer bindings
@@ -161,36 +130,12 @@ int main(void)
     std::cerr << "After shader" << std::endl;
 
     int numParticles = 15;
-    float blurAmount = 1.0f;
+    float alpha = 1.0f;
     float gravity = 0.98f;
     float collisionDampening = 0.9f;
     float particleSize = 0.025f;
     glm::vec3 color(0.0f, 0.0f, 1.0f);
 
-    // Set up VAO and VBO for the fullscreen quad
-    float quadVertices[] = {
-        // positions   // texCoords
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-
-        -1.0f,  1.0f,  0.0f, 1.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f,  1.0f, 1.0f
-    };
-
-    unsigned int quadVAO, quadVBO;
-
-    glGenVertexArrays(1, &quadVAO);
-    glGenBuffers(1, &quadVBO);
-    glBindVertexArray(quadVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-    
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -199,49 +144,47 @@ int main(void)
 
         glfwGetFramebufferSize(window, &width, &height);
 		glViewport(0, 0, width, height);
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
+        
 
+       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+       s.bind();
+       circle.update(0.016f);
+       circle.draw(s);
+       
         // Start the ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-         // Create ImGui window
-        ImGui::Begin("Simulation Controls");
-        static int numParticles = 100;
-        static bool numParticlesChanged = false;
-        ImGui::SliderInt("Number of Particles", &numParticles, 10, 100);
-        ImGui::SliderFloat("Gravity", &gravity, 0.0f, 10.0f);
-        ImGui::SliderFloat("Collision Dampening", &collisionDampening, 0.0f, 1.0f);
-        ImGui::SliderFloat("Particle Size", &particleSize, 0.01f, 0.5f);
-        ImGui::SliderFloat("Blur Amount", &blurAmount, 0.0f, 10.0f);
-        ImGui::ColorEdit3("Color", (float*)&color);
-        ImGui::End();
+        // Create ImGui window
+       ImGui::Begin("Simulation Controls");
+       static int numParticles = 1000;
+       static bool numParticlesChanged = false;
+       if (ImGui::SliderInt("Number of Particles", &numParticles, 10, 5000)) {
+           numParticlesChanged = true;
+       }
+       ImGui::SliderFloat("Gravity", &gravity, 0.0f, 10.0f);
+       ImGui::SliderFloat("Collision Dampening", &collisionDampening, 0.0f, 1.0f);
+       ImGui::SliderFloat("Particle Size", &particleSize, 0.01f, 0.5f);
+       ImGui::SliderFloat("Blur Amount", &alpha, 0.1f, 1.0f);
+       ImGui::ColorEdit3("Color", (float*)&color);
+       ImGui::End();
+
+       if (numParticlesChanged) {
+           circle.setNumParticles(numParticles);
+           numParticlesChanged = false;
+       }
 
         //Update circle with ImGui-parameters
-        circle.setNumParticles(numParticles);
         circle.setGravity(gravity);
         circle.setCollisionDampening(collisionDampening);
         circle.setRadius(particleSize);
         circle.setColor(glm::vec3(color[0], color[1], color[2]));
+        circle.setAlpha(alpha);
 
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		circle.update(0.016f);
-        circle.draw(s);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        // Apply blur shader
-        blurShader.bind();
-        glUniform1i(blurShader.getUniform("screenTexture"), 0);
-        glUniform1f(blurShader.getUniform("blurSize"), blurAmount);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-        glBindVertexArray(quadVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-        glBindVertexArray(0);
-
+        //Enable Blending
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         // Render ImGui
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -258,6 +201,8 @@ int main(void)
     ImGui::DestroyContext();
     //there is no need to call the clear function for the libraries since the os will do that for us.
 	//by calling this functions we are just wasting time.
-	
+	//glDeleteFramebuffers(1, &framebuffer);
+    //glDeleteTextures(1, &textureColorbuffer);
+    glfwTerminate();
     return 0;
 }

@@ -1,16 +1,16 @@
 #version 410 core
 
-out vec4 color;
+in vec2 TexCoords;
+out vec4 fragColor;
 
 uniform vec3 circleColor;
-
-in vec2 TexCoords;
+uniform float alpha;		//opacity
 
 uniform sampler2D screenTexture;
 
 void main()
 {
 	
-	color = texture(screenTexture, TexCoords);
+	fragColor = vec4(circleColor, alpha);
 
 }

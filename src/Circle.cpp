@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <random>
+#include <iostream>
 #include "demoShader.h"
 
 const float boundaryTop = 1.0f;
@@ -87,7 +88,7 @@ void Circle::update(float deltaTime) {
     for (size_t i = 0; i < positions.size(); ++i) {
         positions[i] += velocities[i] * deltaTime;
     }
-    handleCollisions();
+   // handleCollisions();
     keepInBounds();
 }
 
@@ -135,15 +136,29 @@ void Circle::draw(const Shader &shader) {
     glm::mat4 projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
 
     shader.bind();
-    glUniformMatrix4fv(shader.getUniform("projection"), 1, GL_FALSE, &projection[0][0]);
-    glUniform3fv(shader.getUniform("circleColor"), 1, &color[0]);
+    GLint modelLoc = shader.getUniform("model");
+    GLint projectionLoc = shader.getUniform("projection");
+    GLint circleColorLoc = shader.getUniform("circleColor");
+    GLint alphaLoc = shader.getUniform("alpha");
+
+    if (modelLoc == -1 || projectionLoc == -1 || circleColorLoc == -1 || alphaLoc == -1) {
+        std::cerr << "Failed to get uniform locations!" << std::endl;
+        return;
+    }
+
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, &projection[0][0]);
 
     glBindVertexArray(VAO);
     for (const auto &position : positions) {
         glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
-        glUniformMatrix4fv(shader.getUniform("model"), 1, GL_FALSE, &model[0][0]);
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 102);
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, &model[0][0]);
+        glUniform3fv(circleColorLoc, 1, &color[0]);
+        glUniform1f(alphaLoc, alpha); // Use the alpha value from the class
+
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 100);
+        std::cerr << "Drawing circle at position: " << position.x << ", " << position.y << std::endl;
     }
+    
     glBindVertexArray(0);
 }
 
@@ -183,4 +198,8 @@ void Circle::applyGravity(float deltaTime) {
     for (auto &velocity : velocities) {
         velocity.y -= gravity * deltaTime;
     };
+}
+
+void Circle::setAlpha(float a) {
+    alpha = a;
 }

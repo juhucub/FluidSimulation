@@ -18,6 +18,7 @@ public:
     void setRadius(float radius);
     void setColor(const glm::vec3& color);
     void setNumParticles(int numParticles);
+    void setAlpha(float a);
 
 private:
     void applyGravity(float deltaTime);
@@ -30,6 +31,7 @@ private:
     glm::vec3 color;
     float dampingFactor;
     float gravity;
+    float alpha;
 
     unsigned int VAO, VBO;
 };
