@@ -1,4 +1,4 @@
-#include <demoShader.h>
+#include "demoShader.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -64,6 +64,10 @@ std::string Shader::readShaderFile(const char *filePath) {
 
 // Shader class methods
 Shader::Shader() : id(0) {}
+
+Shader::Shader(const char* vertexPath, const char* fragmentPath) {
+    loadShaderProgramFromFile(vertexPath, fragmentPath);
+}
 
 Shader::~Shader() {
     clear();
@@ -132,7 +136,7 @@ bool Shader::loadShaderProgramFromFile(const char *vertexShaderPath, const char 
     return loadShaderProgramFromData(vertexShaderData.c_str(), geometryShaderData.c_str(), fragmentShaderData.c_str());
 }
 
-void Shader::bind() const {
+void Shader::use() const {
     glUseProgram(id);
 }
 
@@ -149,6 +153,10 @@ GLint Shader::getUniform(const char *name) const {
 
 GLuint Shader::getProgramID() const {
     return id;
+}
+
+void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
+    glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 GLint getUniform(GLuint shaderId, const char *name) {

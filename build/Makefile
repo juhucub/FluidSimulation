@@ -48,10 +48,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/homebrew/Cellar/cmake/3.29.2/bin/cmake
+CMAKE_COMMAND = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake
 
 # The command to remove a file.
-RM = /opt/homebrew/Cellar/cmake/3.29.2/bin/cmake -E rm -f
+RM = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -78,7 +78,7 @@ edit_cache/fast: edit_cache
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake to regenerate build system..."
-	/opt/homebrew/Cellar/cmake/3.29.2/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/homebrew/Cellar/cmake/3.29.5/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -279,6 +279,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/objLoader.o: src/objLoader.cpp.o
+.PHONY : src/objLoader.o
+
+# target to build an object file
+src/objLoader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.o
+.PHONY : src/objLoader.cpp.o
+
+src/objLoader.i: src/objLoader.cpp.i
+.PHONY : src/objLoader.i
+
+# target to preprocess a source file
+src/objLoader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.i
+.PHONY : src/objLoader.cpp.i
+
+src/objLoader.s: src/objLoader.cpp.s
+.PHONY : src/objLoader.s
+
+# target to generate assembly for a file
+src/objLoader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.s
+.PHONY : src/objLoader.cpp.s
+
 src/openglDebug.o: src/openglDebug.cpp.o
 .PHONY : src/openglDebug.o
 
@@ -327,6 +351,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/objLoader.o"
+	@echo "... src/objLoader.i"
+	@echo "... src/objLoader.s"
 	@echo "... src/openglDebug.o"
 	@echo "... src/openglDebug.i"
 	@echo "... src/openglDebug.s"

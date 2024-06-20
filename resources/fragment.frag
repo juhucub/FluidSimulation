@@ -1,16 +1,18 @@
 #version 410 core
 
-in vec2 TexCoords;
-out vec4 fragColor;
+in vec3 fragColor;
+in vec2 fragTexCoord;
 
-uniform vec3 circleColor;
-uniform float alpha;		//opacity
+out vec4 color;
 
-uniform sampler2D screenTexture;
+uniform sampler2D textureSampler;
+
+//float depth = LinearizeDepth
 
 void main()
 {
 	
-	fragColor = vec4(circleColor, alpha);
+	vec4 sampleColor = texture(textureSampler, fragTexCoord);
+	color = sampleColor * vec4(fragColor, 1.0);
 
 }

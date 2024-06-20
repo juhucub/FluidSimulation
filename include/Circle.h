@@ -4,35 +4,35 @@
 #include <vector>
 #include "demoShader.h"
 
+const int THREAD_COUNT = 9;
+const float GRAVITY = -9.8f;
+
+struct CircleObject {
+    glm::vec3 current;
+    glm::vec3 previous;
+    glm::vec3 acceleration;
+    float radius;
+
+    CircleObject(float x, float y, float z, float r)
+        : current(x, y, z), previous(x, y, z), radius(r) {
+            acceleration = glm::vec3(0.0f);
+        }
+}; 
+
 class Circle {
 public:
-    Circle(int numParticles, float radius, glm::vec3 color);
-    ~Circle();
+    std::vector<CircleObject> objects;
+    bool running;
 
-    void update(float deltaTime);
-    void initRenderData();
-    void draw(const Shader &shader);
-
-    void setGravity(float gravity);
-    void setCollisionDampening(float d);
-    void setRadius(float radius);
-    void setColor(const glm::vec3& color);
-    void setNumParticles(int numParticles);
-    void setAlpha(float a);
+    Circle(int numParticles, float radius);
+    void addObject(const CircleObject& obj);
+    void applyForces();
+    void applyCollisions();
+    void applyConstraints(const glm::vec3& containerPosition, float containerRadius);
+    void updatePositions(float dt);
+    void runSimulation(float dt, const glm::vec3& containerPosition, float containerRadius);
 
 private:
-    void applyGravity(float deltaTime);
-    void keepInBounds();
-    void handleCollisions();
-
- std::vector<glm::vec2> positions;
-    std::vector<glm::vec2> velocities;
-    float radius;
-    glm::vec3 color;
-    float dampingFactor;
-    float gravity;
-    float alpha;
-
-    unsigned int VAO, VBO;
+    void handleCollision(CircleObject& a, CircleObject& b);
 };
-
+    

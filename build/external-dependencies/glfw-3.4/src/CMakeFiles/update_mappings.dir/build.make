@@ -44,10 +44,10 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /opt/homebrew/Cellar/cmake/3.29.2/bin/cmake
+CMAKE_COMMAND = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake
 
 # The command to remove a file.
-RM = /opt/homebrew/Cellar/cmake/3.29.2/bin/cmake -E rm -f
+RM = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake -E rm -f
 
 # Escaping for special characters.
 EQUALS = =
@@ -68,7 +68,7 @@ include external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/progre
 
 external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Updating gamepad mappings from upstream repository"
-	cd /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src && /opt/homebrew/Cellar/cmake/3.29.2/bin/cmake -P /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/CMake/GenerateMappings.cmake mappings.h.in mappings.h
+	cd /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/src && /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake -P /Users/jacobgardner/Documents/FluidSimulation/external-dependencies/glfw-3.4/CMake/GenerateMappings.cmake mappings.h.in mappings.h
 
 update_mappings: external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings
 update_mappings: external-dependencies/glfw-3.4/src/CMakeFiles/update_mappings.dir/build.make
