@@ -10,6 +10,7 @@ Real-time fluid simulation sandbox built with C++, CMake, GLFW, OpenGL, ImGui, a
 - Publishes per-frame simulation stats for profiling and benchmarking.
 - Supports a CPU path and a Metal path behind the same runtime interface.
 
+![Fluid Simulation Screenshot](docs/fluid-sim.png)
 ## Build Layout
 
 - `build/`: default local development build
