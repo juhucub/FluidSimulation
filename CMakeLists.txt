@@ -2,7 +2,7 @@
 #REFERENCE ^
 
 #Ensures build system features up to date
-cmake_minimum_required(VERSION 3.20.2)
+cmake_minimum_required(VERSION 3.5)
 project(FluidSimulation LANGUAGES C CXX)
 
 if(APPLE)
