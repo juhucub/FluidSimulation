@@ -150,7 +150,7 @@ const unsigned char floor_texture[ F_TEX_WIDTH * F_TEX_HEIGHT ] = {
 //========================================================================
 
 // Maximum number of particles
-#define MAX_PARTICLES   3000
+#define MAX_PARTICLES   9000
 
 // Life span of a particle (in seconds)
 #define LIFE_SPAN       8.f

@@ -57,10 +57,10 @@ RM = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/jacobgardner/Documents/FluidSimulation
+CMAKE_SOURCE_DIR = /Users/jacobgardner/Documents/projects/FluidSimulation
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/FluidSimulation/build
+CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/projects/FluidSimulation/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/FluidSimulation/build
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
-	/opt/homebrew/Cellar/cmake/3.29.2/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/homebrew/Cellar/cmake/3.29.5/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -87,14 +87,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles /Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/stb_truetype//CMakeFiles/progress.marks
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles 0
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/projects/FluidSimulation/build/CMakeFiles /Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/stb_truetype//CMakeFiles/progress.marks
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/projects/FluidSimulation/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/clean
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/clean
 .PHONY : clean
 
 # The main clean target
@@ -103,22 +103,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/preinstall
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/preinstall
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/rule:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/rule
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/rule
 .PHONY : external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/rule
 
 # Convenience name for target.
@@ -127,7 +127,7 @@ stb_truetype: external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/rul
 
 # fast build rule for target.
 stb_truetype/fast:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build
 .PHONY : stb_truetype/fast
 
 src/stb_truetype.o: src/stb_truetype.cpp.o
@@ -135,7 +135,7 @@ src/stb_truetype.o: src/stb_truetype.cpp.o
 
 # target to build an object file
 src/stb_truetype.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.o
 .PHONY : src/stb_truetype.cpp.o
 
 src/stb_truetype.i: src/stb_truetype.cpp.i
@@ -143,7 +143,7 @@ src/stb_truetype.i: src/stb_truetype.cpp.i
 
 # target to preprocess a source file
 src/stb_truetype.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.i
 .PHONY : src/stb_truetype.cpp.i
 
 src/stb_truetype.s: src/stb_truetype.cpp.s
@@ -151,7 +151,7 @@ src/stb_truetype.s: src/stb_truetype.cpp.s
 
 # target to generate assembly for a file
 src/stb_truetype.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/build.make external-dependencies/stb_truetype/CMakeFiles/stb_truetype.dir/src/stb_truetype.cpp.s
 .PHONY : src/stb_truetype.cpp.s
 
 # Help Target
@@ -177,6 +177,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

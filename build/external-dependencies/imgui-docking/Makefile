@@ -57,10 +57,10 @@ RM = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/jacobgardner/Documents/FluidSimulation
+CMAKE_SOURCE_DIR = /Users/jacobgardner/Documents/projects/FluidSimulation
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/FluidSimulation/build
+CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/projects/FluidSimulation/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/FluidSimulation/build
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
-	/opt/homebrew/Cellar/cmake/3.29.2/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/homebrew/Cellar/cmake/3.29.5/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -87,14 +87,14 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles /Users/jacobgardner/Documents/FluidSimulation/build/external-dependencies/imgui-docking//CMakeFiles/progress.marks
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles 0
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/projects/FluidSimulation/build/CMakeFiles /Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/imgui-docking//CMakeFiles/progress.marks
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/projects/FluidSimulation/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/clean
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/clean
 .PHONY : clean
 
 # The main clean target
@@ -103,22 +103,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/preinstall
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/preinstall
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 external-dependencies/imgui-docking/CMakeFiles/imgui.dir/rule:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/CMakeFiles/imgui.dir/rule
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 external-dependencies/imgui-docking/CMakeFiles/imgui.dir/rule
 .PHONY : external-dependencies/imgui-docking/CMakeFiles/imgui.dir/rule
 
 # Convenience name for target.
@@ -127,7 +127,7 @@ imgui: external-dependencies/imgui-docking/CMakeFiles/imgui.dir/rule
 
 # fast build rule for target.
 imgui/fast:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build
 .PHONY : imgui/fast
 
 imgui/backends/imgui_impl_glfw.o: imgui/backends/imgui_impl_glfw.cpp.o
@@ -135,7 +135,7 @@ imgui/backends/imgui_impl_glfw.o: imgui/backends/imgui_impl_glfw.cpp.o
 
 # target to build an object file
 imgui/backends/imgui_impl_glfw.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.o
 .PHONY : imgui/backends/imgui_impl_glfw.cpp.o
 
 imgui/backends/imgui_impl_glfw.i: imgui/backends/imgui_impl_glfw.cpp.i
@@ -143,7 +143,7 @@ imgui/backends/imgui_impl_glfw.i: imgui/backends/imgui_impl_glfw.cpp.i
 
 # target to preprocess a source file
 imgui/backends/imgui_impl_glfw.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.i
 .PHONY : imgui/backends/imgui_impl_glfw.cpp.i
 
 imgui/backends/imgui_impl_glfw.s: imgui/backends/imgui_impl_glfw.cpp.s
@@ -151,7 +151,7 @@ imgui/backends/imgui_impl_glfw.s: imgui/backends/imgui_impl_glfw.cpp.s
 
 # target to generate assembly for a file
 imgui/backends/imgui_impl_glfw.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_glfw.cpp.s
 .PHONY : imgui/backends/imgui_impl_glfw.cpp.s
 
 imgui/backends/imgui_impl_opengl3.o: imgui/backends/imgui_impl_opengl3.cpp.o
@@ -159,7 +159,7 @@ imgui/backends/imgui_impl_opengl3.o: imgui/backends/imgui_impl_opengl3.cpp.o
 
 # target to build an object file
 imgui/backends/imgui_impl_opengl3.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.o
 .PHONY : imgui/backends/imgui_impl_opengl3.cpp.o
 
 imgui/backends/imgui_impl_opengl3.i: imgui/backends/imgui_impl_opengl3.cpp.i
@@ -167,7 +167,7 @@ imgui/backends/imgui_impl_opengl3.i: imgui/backends/imgui_impl_opengl3.cpp.i
 
 # target to preprocess a source file
 imgui/backends/imgui_impl_opengl3.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.i
 .PHONY : imgui/backends/imgui_impl_opengl3.cpp.i
 
 imgui/backends/imgui_impl_opengl3.s: imgui/backends/imgui_impl_opengl3.cpp.s
@@ -175,7 +175,7 @@ imgui/backends/imgui_impl_opengl3.s: imgui/backends/imgui_impl_opengl3.cpp.s
 
 # target to generate assembly for a file
 imgui/backends/imgui_impl_opengl3.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/backends/imgui_impl_opengl3.cpp.s
 .PHONY : imgui/backends/imgui_impl_opengl3.cpp.s
 
 imgui/imgui.o: imgui/imgui.cpp.o
@@ -183,7 +183,7 @@ imgui/imgui.o: imgui/imgui.cpp.o
 
 # target to build an object file
 imgui/imgui.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui.cpp.o
 .PHONY : imgui/imgui.cpp.o
 
 imgui/imgui.i: imgui/imgui.cpp.i
@@ -191,7 +191,7 @@ imgui/imgui.i: imgui/imgui.cpp.i
 
 # target to preprocess a source file
 imgui/imgui.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui.cpp.i
 .PHONY : imgui/imgui.cpp.i
 
 imgui/imgui.s: imgui/imgui.cpp.s
@@ -199,7 +199,7 @@ imgui/imgui.s: imgui/imgui.cpp.s
 
 # target to generate assembly for a file
 imgui/imgui.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui.cpp.s
 .PHONY : imgui/imgui.cpp.s
 
 imgui/imgui_demo.o: imgui/imgui_demo.cpp.o
@@ -207,7 +207,7 @@ imgui/imgui_demo.o: imgui/imgui_demo.cpp.o
 
 # target to build an object file
 imgui/imgui_demo.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.o
 .PHONY : imgui/imgui_demo.cpp.o
 
 imgui/imgui_demo.i: imgui/imgui_demo.cpp.i
@@ -215,7 +215,7 @@ imgui/imgui_demo.i: imgui/imgui_demo.cpp.i
 
 # target to preprocess a source file
 imgui/imgui_demo.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.i
 .PHONY : imgui/imgui_demo.cpp.i
 
 imgui/imgui_demo.s: imgui/imgui_demo.cpp.s
@@ -223,7 +223,7 @@ imgui/imgui_demo.s: imgui/imgui_demo.cpp.s
 
 # target to generate assembly for a file
 imgui/imgui_demo.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_demo.cpp.s
 .PHONY : imgui/imgui_demo.cpp.s
 
 imgui/imgui_draw.o: imgui/imgui_draw.cpp.o
@@ -231,7 +231,7 @@ imgui/imgui_draw.o: imgui/imgui_draw.cpp.o
 
 # target to build an object file
 imgui/imgui_draw.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.o
 .PHONY : imgui/imgui_draw.cpp.o
 
 imgui/imgui_draw.i: imgui/imgui_draw.cpp.i
@@ -239,7 +239,7 @@ imgui/imgui_draw.i: imgui/imgui_draw.cpp.i
 
 # target to preprocess a source file
 imgui/imgui_draw.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.i
 .PHONY : imgui/imgui_draw.cpp.i
 
 imgui/imgui_draw.s: imgui/imgui_draw.cpp.s
@@ -247,7 +247,7 @@ imgui/imgui_draw.s: imgui/imgui_draw.cpp.s
 
 # target to generate assembly for a file
 imgui/imgui_draw.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_draw.cpp.s
 .PHONY : imgui/imgui_draw.cpp.s
 
 imgui/imgui_tables.o: imgui/imgui_tables.cpp.o
@@ -255,7 +255,7 @@ imgui/imgui_tables.o: imgui/imgui_tables.cpp.o
 
 # target to build an object file
 imgui/imgui_tables.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.o
 .PHONY : imgui/imgui_tables.cpp.o
 
 imgui/imgui_tables.i: imgui/imgui_tables.cpp.i
@@ -263,7 +263,7 @@ imgui/imgui_tables.i: imgui/imgui_tables.cpp.i
 
 # target to preprocess a source file
 imgui/imgui_tables.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.i
 .PHONY : imgui/imgui_tables.cpp.i
 
 imgui/imgui_tables.s: imgui/imgui_tables.cpp.s
@@ -271,7 +271,7 @@ imgui/imgui_tables.s: imgui/imgui_tables.cpp.s
 
 # target to generate assembly for a file
 imgui/imgui_tables.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_tables.cpp.s
 .PHONY : imgui/imgui_tables.cpp.s
 
 imgui/imgui_widgets.o: imgui/imgui_widgets.cpp.o
@@ -279,7 +279,7 @@ imgui/imgui_widgets.o: imgui/imgui_widgets.cpp.o
 
 # target to build an object file
 imgui/imgui_widgets.cpp.o:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.o
 .PHONY : imgui/imgui_widgets.cpp.o
 
 imgui/imgui_widgets.i: imgui/imgui_widgets.cpp.i
@@ -287,7 +287,7 @@ imgui/imgui_widgets.i: imgui/imgui_widgets.cpp.i
 
 # target to preprocess a source file
 imgui/imgui_widgets.cpp.i:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.i
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.i
 .PHONY : imgui/imgui_widgets.cpp.i
 
 imgui/imgui_widgets.s: imgui/imgui_widgets.cpp.s
@@ -295,7 +295,7 @@ imgui/imgui_widgets.s: imgui/imgui_widgets.cpp.s
 
 # target to generate assembly for a file
 imgui/imgui_widgets.cpp.s:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.s
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/imgui/imgui_widgets.cpp.s
 .PHONY : imgui/imgui_widgets.cpp.s
 
 # Help Target
@@ -339,6 +339,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /Users/jacobgardner/Documents/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /Users/jacobgardner/Documents/projects/FluidSimulation/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

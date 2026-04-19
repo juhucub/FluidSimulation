@@ -57,10 +57,10 @@ RM = /opt/homebrew/Cellar/cmake/3.29.5/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/jacobgardner/Documents/FluidSimulation
+CMAKE_SOURCE_DIR = /Users/jacobgardner/Documents/projects/FluidSimulation
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/FluidSimulation/build
+CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/projects/FluidSimulation/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -68,7 +68,7 @@ CMAKE_BINARY_DIR = /Users/jacobgardner/Documents/FluidSimulation/build
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
-	/opt/homebrew/Cellar/cmake/3.29.2/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/opt/homebrew/Cellar/cmake/3.29.5/bin/ccmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles /Users/jacobgardner/Documents/FluidSimulation/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/projects/FluidSimulation/build/CMakeFiles /Users/jacobgardner/Documents/projects/FluidSimulation/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/FluidSimulation/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jacobgardner/Documents/projects/FluidSimulation/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -207,125 +207,181 @@ imgui/fast:
 	$(MAKE) $(MAKESILENT) -f external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build.make external-dependencies/imgui-docking/CMakeFiles/imgui.dir/build
 .PHONY : imgui/fast
 
-src/Circle.o: src/Circle.cpp.o
-.PHONY : src/Circle.o
+src/app/controls.o: src/app/controls.cpp.o
+.PHONY : src/app/controls.o
 
 # target to build an object file
-src/Circle.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o
-.PHONY : src/Circle.cpp.o
+src/app/controls.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/app/controls.cpp.o
+.PHONY : src/app/controls.cpp.o
 
-src/Circle.i: src/Circle.cpp.i
-.PHONY : src/Circle.i
+src/app/controls.i: src/app/controls.cpp.i
+.PHONY : src/app/controls.i
 
 # target to preprocess a source file
-src/Circle.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Circle.cpp.i
-.PHONY : src/Circle.cpp.i
+src/app/controls.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/app/controls.cpp.i
+.PHONY : src/app/controls.cpp.i
 
-src/Circle.s: src/Circle.cpp.s
-.PHONY : src/Circle.s
+src/app/controls.s: src/app/controls.cpp.s
+.PHONY : src/app/controls.s
 
 # target to generate assembly for a file
-src/Circle.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/Circle.cpp.s
-.PHONY : src/Circle.cpp.s
+src/app/controls.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/app/controls.cpp.s
+.PHONY : src/app/controls.cpp.s
 
-src/demoShader.o: src/demoShader.cpp.o
-.PHONY : src/demoShader.o
+src/app/main.o: src/app/main.cpp.o
+.PHONY : src/app/main.o
 
 # target to build an object file
-src/demoShader.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o
-.PHONY : src/demoShader.cpp.o
+src/app/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/app/main.cpp.o
+.PHONY : src/app/main.cpp.o
 
-src/demoShader.i: src/demoShader.cpp.i
-.PHONY : src/demoShader.i
+src/app/main.i: src/app/main.cpp.i
+.PHONY : src/app/main.i
 
 # target to preprocess a source file
-src/demoShader.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.i
-.PHONY : src/demoShader.cpp.i
+src/app/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/app/main.cpp.i
+.PHONY : src/app/main.cpp.i
 
-src/demoShader.s: src/demoShader.cpp.s
-.PHONY : src/demoShader.s
+src/app/main.s: src/app/main.cpp.s
+.PHONY : src/app/main.s
 
 # target to generate assembly for a file
-src/demoShader.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.s
-.PHONY : src/demoShader.cpp.s
+src/app/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/app/main.cpp.s
+.PHONY : src/app/main.cpp.s
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+src/platform/MetalSimulationBackend.o: src/platform/MetalSimulationBackend.mm.o
+.PHONY : src/platform/MetalSimulationBackend.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/platform/MetalSimulationBackend.mm.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/platform/MetalSimulationBackend.mm.o
+.PHONY : src/platform/MetalSimulationBackend.mm.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
-
-# target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
-
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
-
-# target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
-
-src/objLoader.o: src/objLoader.cpp.o
-.PHONY : src/objLoader.o
+src/render/WaterRenderer.o: src/render/WaterRenderer.cpp.o
+.PHONY : src/render/WaterRenderer.o
 
 # target to build an object file
-src/objLoader.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.o
-.PHONY : src/objLoader.cpp.o
+src/render/WaterRenderer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/render/WaterRenderer.cpp.o
+.PHONY : src/render/WaterRenderer.cpp.o
 
-src/objLoader.i: src/objLoader.cpp.i
-.PHONY : src/objLoader.i
+src/render/WaterRenderer.i: src/render/WaterRenderer.cpp.i
+.PHONY : src/render/WaterRenderer.i
 
 # target to preprocess a source file
-src/objLoader.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.i
-.PHONY : src/objLoader.cpp.i
+src/render/WaterRenderer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/render/WaterRenderer.cpp.i
+.PHONY : src/render/WaterRenderer.cpp.i
 
-src/objLoader.s: src/objLoader.cpp.s
-.PHONY : src/objLoader.s
+src/render/WaterRenderer.s: src/render/WaterRenderer.cpp.s
+.PHONY : src/render/WaterRenderer.s
 
 # target to generate assembly for a file
-src/objLoader.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.s
-.PHONY : src/objLoader.cpp.s
+src/render/WaterRenderer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/render/WaterRenderer.cpp.s
+.PHONY : src/render/WaterRenderer.cpp.s
 
-src/openglDebug.o: src/openglDebug.cpp.o
-.PHONY : src/openglDebug.o
+src/sim/WaterSimulation.o: src/sim/WaterSimulation.cpp.o
+.PHONY : src/sim/WaterSimulation.o
 
 # target to build an object file
-src/openglDebug.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o
-.PHONY : src/openglDebug.cpp.o
+src/sim/WaterSimulation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/sim/WaterSimulation.cpp.o
+.PHONY : src/sim/WaterSimulation.cpp.o
 
-src/openglDebug.i: src/openglDebug.cpp.i
-.PHONY : src/openglDebug.i
+src/sim/WaterSimulation.i: src/sim/WaterSimulation.cpp.i
+.PHONY : src/sim/WaterSimulation.i
 
 # target to preprocess a source file
-src/openglDebug.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.i
-.PHONY : src/openglDebug.cpp.i
+src/sim/WaterSimulation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/sim/WaterSimulation.cpp.i
+.PHONY : src/sim/WaterSimulation.cpp.i
 
-src/openglDebug.s: src/openglDebug.cpp.s
-.PHONY : src/openglDebug.s
+src/sim/WaterSimulation.s: src/sim/WaterSimulation.cpp.s
+.PHONY : src/sim/WaterSimulation.s
 
 # target to generate assembly for a file
-src/openglDebug.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.s
-.PHONY : src/openglDebug.cpp.s
+src/sim/WaterSimulation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/sim/WaterSimulation.cpp.s
+.PHONY : src/sim/WaterSimulation.cpp.s
+
+src/util/asset/objLoader.o: src/util/asset/objLoader.cpp.o
+.PHONY : src/util/asset/objLoader.o
+
+# target to build an object file
+src/util/asset/objLoader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/asset/objLoader.cpp.o
+.PHONY : src/util/asset/objLoader.cpp.o
+
+src/util/asset/objLoader.i: src/util/asset/objLoader.cpp.i
+.PHONY : src/util/asset/objLoader.i
+
+# target to preprocess a source file
+src/util/asset/objLoader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/asset/objLoader.cpp.i
+.PHONY : src/util/asset/objLoader.cpp.i
+
+src/util/asset/objLoader.s: src/util/asset/objLoader.cpp.s
+.PHONY : src/util/asset/objLoader.s
+
+# target to generate assembly for a file
+src/util/asset/objLoader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/asset/objLoader.cpp.s
+.PHONY : src/util/asset/objLoader.cpp.s
+
+src/util/gl/demoShader.o: src/util/gl/demoShader.cpp.o
+.PHONY : src/util/gl/demoShader.o
+
+# target to build an object file
+src/util/gl/demoShader.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/gl/demoShader.cpp.o
+.PHONY : src/util/gl/demoShader.cpp.o
+
+src/util/gl/demoShader.i: src/util/gl/demoShader.cpp.i
+.PHONY : src/util/gl/demoShader.i
+
+# target to preprocess a source file
+src/util/gl/demoShader.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/gl/demoShader.cpp.i
+.PHONY : src/util/gl/demoShader.cpp.i
+
+src/util/gl/demoShader.s: src/util/gl/demoShader.cpp.s
+.PHONY : src/util/gl/demoShader.s
+
+# target to generate assembly for a file
+src/util/gl/demoShader.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/gl/demoShader.cpp.s
+.PHONY : src/util/gl/demoShader.cpp.s
+
+src/util/gl/openglDebug.o: src/util/gl/openglDebug.cpp.o
+.PHONY : src/util/gl/openglDebug.o
+
+# target to build an object file
+src/util/gl/openglDebug.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/gl/openglDebug.cpp.o
+.PHONY : src/util/gl/openglDebug.cpp.o
+
+src/util/gl/openglDebug.i: src/util/gl/openglDebug.cpp.i
+.PHONY : src/util/gl/openglDebug.i
+
+# target to preprocess a source file
+src/util/gl/openglDebug.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/gl/openglDebug.cpp.i
+.PHONY : src/util/gl/openglDebug.cpp.i
+
+src/util/gl/openglDebug.s: src/util/gl/openglDebug.cpp.s
+.PHONY : src/util/gl/openglDebug.s
+
+# target to generate assembly for a file
+src/util/gl/openglDebug.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/FluidSimulation.dir/build.make CMakeFiles/FluidSimulation.dir/src/util/gl/openglDebug.cpp.s
+.PHONY : src/util/gl/openglDebug.cpp.s
 
 # Help Target
 help:
@@ -342,21 +398,28 @@ help:
 	@echo "... imgui"
 	@echo "... stb_image"
 	@echo "... stb_truetype"
-	@echo "... src/Circle.o"
-	@echo "... src/Circle.i"
-	@echo "... src/Circle.s"
-	@echo "... src/demoShader.o"
-	@echo "... src/demoShader.i"
-	@echo "... src/demoShader.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/objLoader.o"
-	@echo "... src/objLoader.i"
-	@echo "... src/objLoader.s"
-	@echo "... src/openglDebug.o"
-	@echo "... src/openglDebug.i"
-	@echo "... src/openglDebug.s"
+	@echo "... src/app/controls.o"
+	@echo "... src/app/controls.i"
+	@echo "... src/app/controls.s"
+	@echo "... src/app/main.o"
+	@echo "... src/app/main.i"
+	@echo "... src/app/main.s"
+	@echo "... src/platform/MetalSimulationBackend.o"
+	@echo "... src/render/WaterRenderer.o"
+	@echo "... src/render/WaterRenderer.i"
+	@echo "... src/render/WaterRenderer.s"
+	@echo "... src/sim/WaterSimulation.o"
+	@echo "... src/sim/WaterSimulation.i"
+	@echo "... src/sim/WaterSimulation.s"
+	@echo "... src/util/asset/objLoader.o"
+	@echo "... src/util/asset/objLoader.i"
+	@echo "... src/util/asset/objLoader.s"
+	@echo "... src/util/gl/demoShader.o"
+	@echo "... src/util/gl/demoShader.i"
+	@echo "... src/util/gl/demoShader.s"
+	@echo "... src/util/gl/openglDebug.o"
+	@echo "... src/util/gl/openglDebug.i"
+	@echo "... src/util/gl/openglDebug.s"
 .PHONY : help
 
 

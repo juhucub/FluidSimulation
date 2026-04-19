@@ -8,11 +8,14 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/Users/jacobgardner/Documents/FluidSimulation/src/Circle.cpp" "CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/Circle.cpp.o.d"
-  "/Users/jacobgardner/Documents/FluidSimulation/src/demoShader.cpp" "CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/demoShader.cpp.o.d"
-  "/Users/jacobgardner/Documents/FluidSimulation/src/main.cpp" "CMakeFiles/FluidSimulation.dir/src/main.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/main.cpp.o.d"
-  "/Users/jacobgardner/Documents/FluidSimulation/src/objLoader.cpp" "CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/objLoader.cpp.o.d"
-  "/Users/jacobgardner/Documents/FluidSimulation/src/openglDebug.cpp" "CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/openglDebug.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/app/controls.cpp" "CMakeFiles/FluidSimulation.dir/src/app/controls.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/app/controls.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/app/main.cpp" "CMakeFiles/FluidSimulation.dir/src/app/main.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/app/main.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/render/WaterRenderer.cpp" "CMakeFiles/FluidSimulation.dir/src/render/WaterRenderer.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/render/WaterRenderer.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/sim/WaterSimulation.cpp" "CMakeFiles/FluidSimulation.dir/src/sim/WaterSimulation.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/sim/WaterSimulation.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/util/asset/objLoader.cpp" "CMakeFiles/FluidSimulation.dir/src/util/asset/objLoader.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/util/asset/objLoader.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/util/gl/demoShader.cpp" "CMakeFiles/FluidSimulation.dir/src/util/gl/demoShader.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/util/gl/demoShader.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/util/gl/openglDebug.cpp" "CMakeFiles/FluidSimulation.dir/src/util/gl/openglDebug.cpp.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/util/gl/openglDebug.cpp.o.d"
+  "/Users/jacobgardner/Documents/projects/FluidSimulation/src/platform/MetalSimulationBackend.mm" "CMakeFiles/FluidSimulation.dir/src/platform/MetalSimulationBackend.mm.o" "gcc" "CMakeFiles/FluidSimulation.dir/src/platform/MetalSimulationBackend.mm.o.d"
   )
 
 # Targets to which this target links which contain Fortran sources.
