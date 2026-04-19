@@ -7,13 +7,17 @@ CXX_DEFINES = -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\"/Users/jacobgardner/Docume
 
 CXX_INCLUDES = -I/Users/jacobgardner/Documents/projects/FluidSimulation/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/imgui-docking/imgui/backends -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glad/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glm/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glm -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/stb_image/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/stb_truetype/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/System/Library/Frameworks
 
-CXX_FLAGS = -g -std=c++17 -flto=thin -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+CXX_FLAGSarm64 = -g -std=c++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+
+CXX_FLAGS = -g -std=c++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
 
 OBJCXX_DEFINES = -DPRODUCTION_BUILD=0 -DRESOURCES_PATH=\"/Users/jacobgardner/Documents/projects/FluidSimulation/resources/\"
 
 OBJCXX_INCLUDES = -I/Users/jacobgardner/Documents/projects/FluidSimulation/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/imgui-docking/imgui -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/imgui-docking/imgui/backends -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glfw-3.4/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glad/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glm/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glm -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/stb_image/include -I/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/stb_truetype/include -iframework /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk/System/Library/Frameworks
 
-OBJCXX_FLAGS = -g -std=c++17 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+OBJCXX_FLAGSarm64 = -g -std=c++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
+
+OBJCXX_FLAGS = -g -std=c++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.4.sdk
 
 # Custom options: CMakeFiles/FluidSimulation.dir/src/platform/MetalSimulationBackend.mm.o_OPTIONS = -fobjc-arc
 

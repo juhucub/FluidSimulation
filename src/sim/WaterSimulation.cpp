@@ -28,23 +28,42 @@ float toMilliseconds(const Clock::duration& duration) {
     return std::chrono::duration<float, std::milli>(duration).count();
 }
 
-float poly6Kernel(float distanceSquared, float smoothingLength) {
-    if (distanceSquared >= smoothingLength * smoothingLength) {
+float computePoly6Coefficient(float smoothingLength) {
+    const float h2 = smoothingLength * smoothingLength;
+    const float h4 = h2 * h2;
+    const float h6 = h4 * h2;
+    const float h9 = h6 * h2 * smoothingLength;
+    return 315.0f / (64.0f * kPi * h9);
+}
+
+float computeSpikyGradientCoefficient(float smoothingLength) {
+    const float h2 = smoothingLength * smoothingLength;
+    const float h4 = h2 * h2;
+    const float h6 = h4 * h2;
+    return -45.0f / (kPi * h6);
+}
+
+float poly6Kernel(float distanceSquared, float smoothingLengthSquared, float poly6Coefficient) {
+    if (distanceSquared >= smoothingLengthSquared) {
         return 0.0f;
     }
 
-    const float h2MinusR2 = smoothingLength * smoothingLength - distanceSquared;
-    const float coefficient = 315.0f / (64.0f * kPi * std::pow(smoothingLength, 9.0f));
-    return coefficient * h2MinusR2 * h2MinusR2 * h2MinusR2;
+    const float h2MinusR2 = smoothingLengthSquared - distanceSquared;
+    return poly6Coefficient * h2MinusR2 * h2MinusR2 * h2MinusR2;
 }
 
-glm::vec3 spikyGradient(const glm::vec3& delta, float distance, float smoothingLength) {
+glm::vec3 spikyGradient(
+    const glm::vec3& delta,
+    float distance,
+    float smoothingLength,
+    float spikyGradientCoefficient
+) {
     if (distance <= kEpsilon || distance >= smoothingLength) {
         return glm::vec3(0.0f);
     }
 
-    const float coefficient = -45.0f / (kPi * std::pow(smoothingLength, 6.0f));
-    const float scale = coefficient * (smoothingLength - distance) * (smoothingLength - distance) / distance;
+    const float scale =
+        spikyGradientCoefficient * (smoothingLength - distance) * (smoothingLength - distance) / distance;
     return delta * scale;
 }
 
@@ -61,6 +80,17 @@ float structuralDifference(const WaterSimulationSettings& lhs, const WaterSimula
            std::abs(lhs.smoothingLength - rhs.smoothingLength) +
            std::abs(lhs.particleMass - rhs.particleMass) +
            std::abs(lhs.restDensity - rhs.restDensity);
+}
+
+float computeOpenTopGridMaxY(const WaterSimulationSettings& settings) {
+    const float spacing = settings.particleRadius * kSpawnSpacingScale;
+    const float estimatedSpawnTop =
+        settings.containerFloorY +
+        settings.particleRadius * 1.6f +
+        static_cast<float>(std::max(settings.particlesY - 1, 0)) * spacing +
+        settings.particleRadius;
+    const float splashHeadroom = std::max(settings.smoothingLength * 4.0f, settings.particleRadius * 8.0f);
+    return std::max(settings.containerLipY + splashHeadroom, estimatedSpawnTop + splashHeadroom * 0.5f);
 }
 } // namespace
 
@@ -182,6 +212,38 @@ private:
     std::uint64_t generation_ = 0;
 };
 
+void WaterSimulation::ParticleSoA::resize(std::size_t particleCount, float restDensity) {
+    posX.assign(particleCount, 0.0f);
+    posY.assign(particleCount, 0.0f);
+    posZ.assign(particleCount, 0.0f);
+    predX.assign(particleCount, 0.0f);
+    predY.assign(particleCount, 0.0f);
+    predZ.assign(particleCount, 0.0f);
+    velX.assign(particleCount, 0.0f);
+    velY.assign(particleCount, 0.0f);
+    velZ.assign(particleCount, 0.0f);
+    provisionalVelX.assign(particleCount, 0.0f);
+    provisionalVelY.assign(particleCount, 0.0f);
+    provisionalVelZ.assign(particleCount, 0.0f);
+    density.assign(particleCount, restDensity);
+    alpha.assign(particleCount, 0.0f);
+    densityPressure.assign(particleCount, 0.0f);
+    divergencePressure.assign(particleCount, 0.0f);
+    densityError.assign(particleCount, 0.0f);
+    divergenceError.assign(particleCount, 0.0f);
+    deltaX.assign(particleCount, 0.0f);
+    deltaY.assign(particleCount, 0.0f);
+    deltaZ.assign(particleCount, 0.0f);
+    speedMetric.assign(particleCount, 0.0f);
+    densityMetric.assign(particleCount, 1.0f);
+    pressureMetric.assign(particleCount, 0.0f);
+    interactionMetric.assign(particleCount, 0.0f);
+    foam.assign(particleCount, 0.0f);
+    interactionHeat.assign(particleCount, 0.0f);
+    stableParticleIds.assign(particleCount, 0);
+    cellIndices.assign(particleCount, 0);
+}
+
 WaterSimulation::WaterSimulation(const WaterSimulationSettings& settings)
     : settings_(settings),
       halfDomain_(0.0f),
@@ -193,6 +255,11 @@ WaterSimulation::WaterSimulation(const WaterSimulationSettings& settings)
       gridResolutionZ_(0),
       interactionPlaneY_(0.0f),
       spawnTopY_(0.0f),
+      smoothingLengthSquared_(0.0f),
+      poly6Coefficient_(0.0f),
+      spikyGradientCoefficient_(0.0f),
+      selfDensityKernel_(0.0f),
+      correctionReferenceKernel_(0.0f),
       workerPool_(new WorkerPool(std::max(1u, std::thread::hardware_concurrency()))),
       metalBackend_(nullptr),
       activeBackend_(SimulationBackend::CPU) {
@@ -241,8 +308,16 @@ void WaterSimulation::sanitizeSettings() {
 void WaterSimulation::updateConfiguration() {
     halfDomain_ = settings_.domainSize * 0.5f;
     cellSize_ = settings_.smoothingLength;
+    smoothingLengthSquared_ = settings_.smoothingLength * settings_.smoothingLength;
+    poly6Coefficient_ = computePoly6Coefficient(settings_.smoothingLength);
+    spikyGradientCoefficient_ = computeSpikyGradientCoefficient(settings_.smoothingLength);
+    selfDensityKernel_ = poly6Kernel(0.0f, smoothingLengthSquared_, poly6Coefficient_);
     gridMin_ = glm::vec3(-halfDomain_, settings_.containerFloorY, -halfDomain_);
-    gridMax_ = glm::vec3(halfDomain_, settings_.containerLipY, halfDomain_);
+    gridMax_ = glm::vec3(halfDomain_, computeOpenTopGridMaxY(settings_), halfDomain_);
+    correctionReferenceKernel_ = std::max(
+        poly6Kernel(smoothingLengthSquared_ * 0.12f, smoothingLengthSquared_, poly6Coefficient_),
+        kEpsilon
+    );
 
     gridResolutionX_ = std::max(1, static_cast<int>(std::ceil((gridMax_.x - gridMin_.x) / cellSize_)) + 1);
     gridResolutionY_ = std::max(1, static_cast<int>(std::ceil((gridMax_.y - gridMin_.y) / cellSize_)) + 1);
@@ -257,30 +332,11 @@ void WaterSimulation::updateConfiguration() {
         static_cast<std::size_t>(gridResolutionY_) *
         static_cast<std::size_t>(gridResolutionZ_);
 
-    posX_.assign(particleCount, 0.0f);
-    posY_.assign(particleCount, 0.0f);
-    posZ_.assign(particleCount, 0.0f);
-    predX_.assign(particleCount, 0.0f);
-    predY_.assign(particleCount, 0.0f);
-    predZ_.assign(particleCount, 0.0f);
-    velX_.assign(particleCount, 0.0f);
-    velY_.assign(particleCount, 0.0f);
-    velZ_.assign(particleCount, 0.0f);
-    density_.assign(particleCount, settings_.restDensity);
-    lambda_.assign(particleCount, 0.0f);
-    deltaX_.assign(particleCount, 0.0f);
-    deltaY_.assign(particleCount, 0.0f);
-    deltaZ_.assign(particleCount, 0.0f);
-    speedMetric_.assign(particleCount, 0.0f);
-    densityMetric_.assign(particleCount, 1.0f);
-    pressureMetric_.assign(particleCount, 0.0f);
-    interactionMetric_.assign(particleCount, 0.0f);
-    foam_.assign(particleCount, 0.0f);
-    interactionHeat_.assign(particleCount, 0.0f);
-    particleCellIndices_.assign(particleCount, 0);
+    activeState_.resize(particleCount, settings_.restDensity);
+    scratchState_.resize(particleCount, settings_.restDensity);
     cellCounts_.assign(cellCount, 0);
     cellStarts_.assign(cellCount + 1, 0);
-    sortedParticleIndices_.assign(particleCount, 0);
+    cellWriteHeads_.assign(cellCount, 0);
 }
 
 void WaterSimulation::reset() {
@@ -301,6 +357,7 @@ void WaterSimulation::reset() {
     const float startX = -0.5f * static_cast<float>(settings_.particlesX - 1) * spacing;
     const float startZ = -0.5f * static_cast<float>(settings_.particlesZ - 1) * spacing;
     const float startY = settings_.containerFloorY + settings_.particleRadius * 1.6f;
+    auto& state = activeState_;
 
     std::size_t index = 0;
     for (int y = 0; y < settings_.particlesY; ++y) {
@@ -316,23 +373,29 @@ void WaterSimulation::reset() {
                     startZ + static_cast<float>(z) * spacing + jitterB * settings_.particleRadius * 0.02f;
                 enforceBounds(px, py, pz);
 
-                posX_[index] = px;
-                posY_[index] = py;
-                posZ_[index] = pz;
-                predX_[index] = px;
-                predY_[index] = py;
-                predZ_[index] = pz;
+                state.posX[index] = px;
+                state.posY[index] = py;
+                state.posZ[index] = pz;
+                state.predX[index] = px;
+                state.predY[index] = py;
+                state.predZ[index] = pz;
+                state.stableParticleIds[index] = static_cast<int>(index);
                 ++index;
             }
         }
     }
 
     spawnTopY_ = startY + static_cast<float>(settings_.particlesY - 1) * spacing + settings_.particleRadius;
-    rebuildSpatialGrid(posX_, posY_, posZ_);
-    std::size_t neighborSamples = 0;
-    computeFinalState(1.0f / 120.0f, neighborSamples);
+    rebuildSpatialGrid(state.posX, state.posY, state.posZ);
+    constexpr int kSettleSteps = 10;
+    constexpr float kSettleDeltaTime = 1.0f / 240.0f;
+    for (int settleStep = 0; settleStep < kSettleSteps; ++settleStep) {
+        step(kSettleDeltaTime);
+    }
+    rebuildSpatialGrid(state.posX, state.posY, state.posZ);
     updateDerivedState();
-    stats_.frameIndex = 0;
+    stats_ = {};
+    stats_.particleCount = particleCount();
 }
 
 void WaterSimulation::rebuildSpatialGrid(
@@ -340,11 +403,13 @@ void WaterSimulation::rebuildSpatialGrid(
     const std::vector<float>& ys,
     const std::vector<float>& zs
 ) {
+    auto& state = activeState_;
+    auto& scratch = scratchState_;
     std::fill(cellCounts_.begin(), cellCounts_.end(), 0);
 
     for (std::size_t i = 0; i < xs.size(); ++i) {
         const int cellIndex = positionToCellIndex(xs[i], ys[i], zs[i]);
-        particleCellIndices_[i] = cellIndex;
+        state.cellIndices[i] = cellIndex;
         ++cellCounts_[cellIndex];
     }
 
@@ -357,75 +422,104 @@ void WaterSimulation::rebuildSpatialGrid(
         cellStarts_[cellIndex + 1] = cellStarts_[cellIndex] + cellCounts_[cellIndex];
     }
 
-    std::vector<int> writeHeads(cellStarts_.begin(), cellStarts_.end() - 1);
+    std::copy(cellStarts_.begin(), cellStarts_.end() - 1, cellWriteHeads_.begin());
     for (std::size_t i = 0; i < xs.size(); ++i) {
-        const int cellIndex = particleCellIndices_[i];
-        sortedParticleIndices_[static_cast<std::size_t>(writeHeads[cellIndex]++)] = static_cast<int>(i);
+        const std::size_t destination = static_cast<std::size_t>(cellWriteHeads_[state.cellIndices[i]]++);
+        scratch.cellIndices[destination] = state.cellIndices[i];
+        scratch.stableParticleIds[destination] = state.stableParticleIds[i];
+        scratch.posX[destination] = state.posX[i];
+        scratch.posY[destination] = state.posY[i];
+        scratch.posZ[destination] = state.posZ[i];
+        scratch.predX[destination] = state.predX[i];
+        scratch.predY[destination] = state.predY[i];
+        scratch.predZ[destination] = state.predZ[i];
+        scratch.velX[destination] = state.velX[i];
+        scratch.velY[destination] = state.velY[i];
+        scratch.velZ[destination] = state.velZ[i];
+        scratch.densityPressure[destination] = state.densityPressure[i];
+        scratch.foam[destination] = state.foam[i];
+        scratch.interactionHeat[destination] = state.interactionHeat[i];
     }
+
+    std::swap(activeState_, scratchState_);
 }
 
 void WaterSimulation::integratePredictedPositions(float deltaTime) {
     const float damping = std::exp(-settings_.velocityDamping * deltaTime);
-    workerPool_->parallelFor(posX_.size(), [this, deltaTime, damping](std::size_t begin, std::size_t end) {
+    auto& state = activeState_;
+    workerPool_->parallelFor(state.posX.size(), [this, &state, deltaTime, damping](std::size_t begin, std::size_t end) {
         for (std::size_t i = begin; i < end; ++i) {
-            velY_[i] -= settings_.gravity * deltaTime;
-            velX_[i] *= damping;
-            velY_[i] *= damping;
-            velZ_[i] *= damping;
+            state.velY[i] -= settings_.gravity * deltaTime;
+            state.velX[i] *= damping;
+            state.velY[i] *= damping;
+            state.velZ[i] *= damping;
 
-            const float speedSquared = velX_[i] * velX_[i] + velY_[i] * velY_[i] + velZ_[i] * velZ_[i];
+            const float speedSquared =
+                state.velX[i] * state.velX[i] + state.velY[i] * state.velY[i] + state.velZ[i] * state.velZ[i];
             const float maxSpeedSquared = settings_.maxSpeed * settings_.maxSpeed;
             if (speedSquared > maxSpeedSquared) {
                 const float scale = settings_.maxSpeed / std::sqrt(std::max(speedSquared, kEpsilon));
-                velX_[i] *= scale;
-                velY_[i] *= scale;
-                velZ_[i] *= scale;
+                state.velX[i] *= scale;
+                state.velY[i] *= scale;
+                state.velZ[i] *= scale;
             }
 
-            float px = posX_[i] + velX_[i] * deltaTime;
-            float py = posY_[i] + velY_[i] * deltaTime;
-            float pz = posZ_[i] + velZ_[i] * deltaTime;
+            float px = state.posX[i] + state.velX[i] * deltaTime;
+            float py = state.posY[i] + state.velY[i] * deltaTime;
+            float pz = state.posZ[i] + state.velZ[i] * deltaTime;
             enforceBounds(px, py, pz);
-            predX_[i] = px;
-            predY_[i] = py;
-            predZ_[i] = pz;
+            state.predX[i] = px;
+            state.predY[i] = py;
+            state.predZ[i] = pz;
         }
     });
 }
 
-void WaterSimulation::computeDensityAndLambdas(std::size_t& neighborSamples) {
-    const float w0 = poly6Kernel(0.0f, settings_.smoothingLength);
+void WaterSimulation::computeDensityAndAlpha(std::size_t& neighborSamples) {
+    auto& state = activeState_;
     const float restDensity = std::max(settings_.restDensity, kEpsilon);
-    const float lambdaEpsilon = 4.0e-3f;
+    const float alphaEpsilon = 4.0e-3f;
+    const float densityGradientScale = settings_.particleMass / restDensity;
     std::atomic<std::size_t> neighborCounter{0};
 
     workerPool_->parallelFor(
-        predX_.size(),
-        [this, w0, restDensity, lambdaEpsilon, &neighborCounter](std::size_t begin, std::size_t end) {
+        state.predX.size(),
+        [this, &state, restDensity, alphaEpsilon, densityGradientScale, &neighborCounter](std::size_t begin, std::size_t end) {
             std::size_t localNeighbors = 0;
             for (std::size_t i = begin; i < end; ++i) {
-                float density = settings_.particleMass * w0;
-                forEachNeighbor(i, predX_, predY_, predZ_, [&](std::size_t, float, float, float, float distanceSquared) {
-                    density += settings_.particleMass * poly6Kernel(distanceSquared, settings_.smoothingLength);
-                    ++localNeighbors;
-                });
-                density_[i] = density;
-
-                const float constraint = glm::clamp(density / restDensity - 1.0f, -0.12f, 1.5f);
+                float density = settings_.particleMass * selfDensityKernel_;
                 glm::vec3 gradI(0.0f);
                 float sumGradients = 0.0f;
 
-                forEachNeighbor(i, predX_, predY_, predZ_, [&](std::size_t, float dx, float dy, float dz, float distanceSquared) {
-                    const float distance = std::sqrt(std::max(distanceSquared, kEpsilon));
-                    const glm::vec3 gradient =
-                        (settings_.particleMass / restDensity) *
-                        spikyGradient(glm::vec3(dx, dy, dz), distance, settings_.smoothingLength);
-                    sumGradients += glm::dot(gradient, gradient);
-                    gradI += gradient;
-                });
-                sumGradients += glm::dot(gradI, gradI);
+                forEachNeighbor(
+                    i,
+                    state,
+                    state.predX,
+                    state.predY,
+                    state.predZ,
+                    [&](std::size_t, float dx, float dy, float dz, float distanceSquared) {
+                        const float kernel = poly6Kernel(distanceSquared, smoothingLengthSquared_, poly6Coefficient_);
+                        density += settings_.particleMass * kernel;
 
-                lambda_[i] = -constraint / (sumGradients + lambdaEpsilon);
+                        const float distance = std::sqrt(std::max(distanceSquared, kEpsilon));
+                        const glm::vec3 gradient =
+                            densityGradientScale *
+                            spikyGradient(
+                                glm::vec3(dx, dy, dz),
+                                distance,
+                                settings_.smoothingLength,
+                                spikyGradientCoefficient_
+                            );
+                        sumGradients += glm::dot(gradient, gradient);
+                        gradI += gradient;
+                        ++localNeighbors;
+                    }
+                );
+
+                sumGradients += glm::dot(gradI, gradI);
+                state.density[i] = density;
+                state.alpha[i] = 1.0f / (sumGradients + alphaEpsilon);
+                state.densityError[i] = density / restDensity - 1.0f;
             }
             neighborCounter.fetch_add(localNeighbors, std::memory_order_relaxed);
         }
@@ -434,36 +528,54 @@ void WaterSimulation::computeDensityAndLambdas(std::size_t& neighborSamples) {
     neighborSamples += neighborCounter.load(std::memory_order_relaxed);
 }
 
-void WaterSimulation::computePositionCorrections(float) {
-    const float correctionReference = std::max(
-        poly6Kernel(settings_.smoothingLength * settings_.smoothingLength * 0.12f, settings_.smoothingLength),
-        kEpsilon
-    );
-    const float targetSeparation = settings_.particleRadius * 1.65f;
-    const float maxCorrection = settings_.particleRadius * 0.22f;
-    const float correctionScale = settings_.positionRelaxation * settings_.pressureStiffness / std::max(settings_.restDensity, kEpsilon);
+void WaterSimulation::solveDensityPressureIteration() {
+    auto& state = activeState_;
+    const float restDensity = std::max(settings_.restDensity, kEpsilon);
+    const float targetSeparation = settings_.particleRadius * 1.45f;
+    const float maxCorrection = settings_.particleRadius * 0.2f;
+    const float correctionScale = settings_.positionRelaxation * settings_.pressureStiffness / restDensity;
     const float tensileScale = settings_.tensileCorrection * settings_.nearPressureStiffness;
 
+    workerPool_->parallelFor(state.predX.size(), [this, &state](std::size_t begin, std::size_t end) {
+        for (std::size_t i = begin; i < end; ++i) {
+            const float pressureSource = glm::clamp(state.densityError[i], -0.18f, 2.0f);
+            state.densityPressure[i] += -pressureSource * state.alpha[i];
+        }
+    });
+
     workerPool_->parallelFor(
-        predX_.size(),
-        [this, correctionReference, targetSeparation, maxCorrection, correctionScale, tensileScale](std::size_t begin, std::size_t end) {
+        state.predX.size(),
+        [this, &state, targetSeparation, maxCorrection, correctionScale, tensileScale](std::size_t begin, std::size_t end) {
             for (std::size_t i = begin; i < end; ++i) {
                 glm::vec3 correction(0.0f);
 
-                forEachNeighbor(i, predX_, predY_, predZ_, [&](std::size_t neighbor, float dx, float dy, float dz, float distanceSquared) {
-                    const float distance = std::sqrt(std::max(distanceSquared, kEpsilon));
-                    const glm::vec3 delta(dx, dy, dz);
-                    const glm::vec3 gradient = spikyGradient(delta, distance, settings_.smoothingLength);
-                    const float corr =
-                        -tensileScale *
-                        std::pow(poly6Kernel(distanceSquared, settings_.smoothingLength) / correctionReference, 4.0f);
-                    correction += (lambda_[i] + lambda_[neighbor] + corr) * gradient;
+                forEachNeighbor(
+                    i,
+                    state,
+                    state.predX,
+                    state.predY,
+                    state.predZ,
+                    [&](std::size_t neighbor, float dx, float dy, float dz, float distanceSquared) {
+                        const float distance = std::sqrt(std::max(distanceSquared, kEpsilon));
+                        const glm::vec3 delta(dx, dy, dz);
+                        const glm::vec3 gradient =
+                            spikyGradient(delta, distance, settings_.smoothingLength, spikyGradientCoefficient_);
+                        const float corr =
+                            -tensileScale *
+                            std::pow(
+                                poly6Kernel(distanceSquared, smoothingLengthSquared_, poly6Coefficient_) /
+                                    correctionReferenceKernel_,
+                                4.0f
+                            );
+                        correction +=
+                            (state.densityPressure[i] + state.densityPressure[neighbor] + corr) * gradient;
 
-                    if (distance < targetSeparation) {
-                        const float overlap = targetSeparation - distance;
-                        correction += (delta / distance) * (overlap * 0.025f);
+                        if (distance < targetSeparation) {
+                            const float overlap = targetSeparation - distance;
+                            correction += (delta / distance) * (overlap * 0.014f);
+                        }
                     }
-                });
+                );
 
                 correction *= correctionScale;
                 const float correctionLength = glm::length(correction);
@@ -471,34 +583,159 @@ void WaterSimulation::computePositionCorrections(float) {
                     correction *= maxCorrection / correctionLength;
                 }
 
-                deltaX_[i] = correction.x;
-                deltaY_[i] = correction.y;
-                deltaZ_[i] = correction.z;
+                state.deltaX[i] = correction.x;
+                state.deltaY[i] = correction.y;
+                state.deltaZ[i] = correction.z;
             }
         }
     );
 }
 
 void WaterSimulation::applyPredictedCorrections() {
-    workerPool_->parallelFor(predX_.size(), [this](std::size_t begin, std::size_t end) {
+    auto& state = activeState_;
+    workerPool_->parallelFor(state.predX.size(), [this, &state](std::size_t begin, std::size_t end) {
         for (std::size_t i = begin; i < end; ++i) {
-            float px = predX_[i] + deltaX_[i];
-            float py = predY_[i] + deltaY_[i];
-            float pz = predZ_[i] + deltaZ_[i];
+            float px = state.predX[i] + state.deltaX[i];
+            float py = state.predY[i] + state.deltaY[i];
+            float pz = state.predZ[i] + state.deltaZ[i];
             enforceBounds(px, py, pz);
-            predX_[i] = px;
-            predY_[i] = py;
-            predZ_[i] = pz;
+            state.predX[i] = px;
+            state.predY[i] = py;
+            state.predZ[i] = pz;
+        }
+    });
+}
+
+void WaterSimulation::updateProvisionalVelocities(float deltaTime) {
+    auto& state = activeState_;
+    workerPool_->parallelFor(state.predX.size(), [this, &state, deltaTime](std::size_t begin, std::size_t end) {
+        for (std::size_t i = begin; i < end; ++i) {
+            state.provisionalVelX[i] = (state.predX[i] - state.posX[i]) / std::max(deltaTime, kEpsilon);
+            state.provisionalVelY[i] = (state.predY[i] - state.posY[i]) / std::max(deltaTime, kEpsilon);
+            state.provisionalVelZ[i] = (state.predZ[i] - state.posZ[i]) / std::max(deltaTime, kEpsilon);
+        }
+    });
+}
+
+void WaterSimulation::computeDivergenceAndAlpha(float deltaTime, std::size_t& neighborSamples) {
+    auto& state = activeState_;
+    const float restDensity = std::max(settings_.restDensity, kEpsilon);
+    const float alphaEpsilon = 4.0e-3f;
+    const float densityGradientScale = settings_.particleMass / restDensity;
+    std::atomic<std::size_t> neighborCounter{0};
+
+    workerPool_->parallelFor(
+        state.predX.size(),
+        [this, &state, deltaTime, densityGradientScale, alphaEpsilon, &neighborCounter](std::size_t begin, std::size_t end) {
+            std::size_t localNeighbors = 0;
+            for (std::size_t i = begin; i < end; ++i) {
+                const glm::vec3 velocityI(
+                    state.provisionalVelX[i],
+                    state.provisionalVelY[i],
+                    state.provisionalVelZ[i]
+                );
+                glm::vec3 gradI(0.0f);
+                float sumGradients = 0.0f;
+                float divergence = 0.0f;
+
+                forEachNeighbor(
+                    i,
+                    state,
+                    state.predX,
+                    state.predY,
+                    state.predZ,
+                    [&](std::size_t neighbor, float dx, float dy, float dz, float distanceSquared) {
+                        const float distance = std::sqrt(std::max(distanceSquared, kEpsilon));
+                        const glm::vec3 gradient =
+                            densityGradientScale *
+                            spikyGradient(
+                                glm::vec3(dx, dy, dz),
+                                distance,
+                                settings_.smoothingLength,
+                                spikyGradientCoefficient_
+                            );
+                        const glm::vec3 velocityJ(
+                            state.provisionalVelX[neighbor],
+                            state.provisionalVelY[neighbor],
+                            state.provisionalVelZ[neighbor]
+                        );
+                        sumGradients += glm::dot(gradient, gradient);
+                        gradI += gradient;
+                        divergence += glm::dot(velocityI - velocityJ, gradient);
+                        ++localNeighbors;
+                    }
+                );
+
+                sumGradients += glm::dot(gradI, gradI);
+                state.alpha[i] = 1.0f / (sumGradients + alphaEpsilon);
+                state.divergenceError[i] = glm::clamp(divergence * deltaTime, 0.0f, 2.0f);
+            }
+            neighborCounter.fetch_add(localNeighbors, std::memory_order_relaxed);
+        }
+    );
+
+    neighborSamples += neighborCounter.load(std::memory_order_relaxed);
+}
+
+void WaterSimulation::solveDivergenceIteration(float deltaTime) {
+    auto& state = activeState_;
+
+    workerPool_->parallelFor(state.predX.size(), [this, &state](std::size_t begin, std::size_t end) {
+        for (std::size_t i = begin; i < end; ++i) {
+            state.divergencePressure[i] += -state.divergenceError[i] * state.alpha[i];
+        }
+    });
+
+    workerPool_->parallelFor(state.predX.size(), [this, &state, deltaTime](std::size_t begin, std::size_t end) {
+        for (std::size_t i = begin; i < end; ++i) {
+            glm::vec3 velocityCorrection(0.0f);
+
+            forEachNeighbor(
+                i,
+                state,
+                state.predX,
+                state.predY,
+                state.predZ,
+                [&](std::size_t neighbor, float dx, float dy, float dz, float distanceSquared) {
+                    const float distance = std::sqrt(std::max(distanceSquared, kEpsilon));
+                    const glm::vec3 gradient =
+                        spikyGradient(
+                            glm::vec3(dx, dy, dz),
+                            distance,
+                            settings_.smoothingLength,
+                            spikyGradientCoefficient_
+                        );
+                    velocityCorrection +=
+                        (state.divergencePressure[i] + state.divergencePressure[neighbor]) *
+                        settings_.particleMass *
+                        gradient;
+                }
+            );
+
+            state.provisionalVelX[i] += velocityCorrection.x * deltaTime;
+            state.provisionalVelY[i] += velocityCorrection.y * deltaTime;
+            state.provisionalVelZ[i] += velocityCorrection.z * deltaTime;
+
+            const float speedSquared =
+                state.provisionalVelX[i] * state.provisionalVelX[i] +
+                state.provisionalVelY[i] * state.provisionalVelY[i] +
+                state.provisionalVelZ[i] * state.provisionalVelZ[i];
+            const float maxSpeedSquared = settings_.maxSpeed * settings_.maxSpeed;
+            if (speedSquared > maxSpeedSquared && speedSquared > kEpsilon) {
+                const float scale = settings_.maxSpeed / std::sqrt(speedSquared);
+                state.provisionalVelX[i] *= scale;
+                state.provisionalVelY[i] *= scale;
+                state.provisionalVelZ[i] *= scale;
+            }
         }
     });
 }
 
 void WaterSimulation::computeFinalState(float deltaTime, std::size_t& neighborSamples) {
-    const float w0 = poly6Kernel(0.0f, settings_.smoothingLength);
+    auto& state = activeState_;
     const float minX = -halfDomain_ + settings_.particleRadius;
     const float maxX = halfDomain_ - settings_.particleRadius;
     const float minY = settings_.containerFloorY + settings_.particleRadius;
-    const float maxY = settings_.containerLipY - settings_.particleRadius;
     const float minZ = -halfDomain_ + settings_.particleRadius;
     const float maxZ = halfDomain_ - settings_.particleRadius;
     const float restDensity = std::max(settings_.restDensity, kEpsilon);
@@ -508,105 +745,129 @@ void WaterSimulation::computeFinalState(float deltaTime, std::size_t& neighborSa
     std::atomic<std::size_t> neighborCounter{0};
 
     workerPool_->parallelFor(
-        predX_.size(),
-        [this, w0, minX, maxX, minY, maxY, minZ, maxZ, restDensity, foamDamping, tangentialScale, deltaTime, &neighborCounter](std::size_t begin, std::size_t end) {
+        state.predX.size(),
+        [this, &state, minX, maxX, minY, minZ, maxZ, restDensity, foamDamping, tangentialScale, deltaTime, &neighborCounter](std::size_t begin, std::size_t end) {
             std::size_t localNeighbors = 0;
             for (std::size_t i = begin; i < end; ++i) {
-                const glm::vec3 predicted(predX_[i], predY_[i], predZ_[i]);
-                const glm::vec3 previousVelocity(velX_[i], velY_[i], velZ_[i]);
+                const glm::vec3 predicted(state.predX[i], state.predY[i], state.predZ[i]);
+                const glm::vec3 previousVelocity(state.velX[i], state.velY[i], state.velZ[i]);
+                const glm::vec3 baseVelocity(
+                    state.provisionalVelX[i],
+                    state.provisionalVelY[i],
+                    state.provisionalVelZ[i]
+                );
 
-                float density = settings_.particleMass * w0;
+                float density = settings_.particleMass * selfDensityKernel_;
                 glm::vec3 xsph(0.0f);
-                forEachNeighbor(i, predX_, predY_, predZ_, [&](std::size_t neighbor, float, float, float, float distanceSquared) {
-                    const float kernel = poly6Kernel(distanceSquared, settings_.smoothingLength);
-                    density += settings_.particleMass * kernel;
-                    xsph += glm::vec3(
-                        velX_[neighbor] - velX_[i],
-                        velY_[neighbor] - velY_[i],
-                        velZ_[neighbor] - velZ_[i]
-                    ) * kernel;
-                    ++localNeighbors;
-                });
+                glm::vec3 pairwiseViscosity(0.0f);
+                forEachNeighbor(
+                    i,
+                    state,
+                    state.predX,
+                    state.predY,
+                    state.predZ,
+                    [&](std::size_t neighbor, float dx, float dy, float dz, float distanceSquared) {
+                        const float kernel = poly6Kernel(distanceSquared, smoothingLengthSquared_, poly6Coefficient_);
+                        density += settings_.particleMass * kernel;
+                        const glm::vec3 neighborVelocity(
+                            state.provisionalVelX[neighbor] - state.provisionalVelX[i],
+                            state.provisionalVelY[neighbor] - state.provisionalVelY[i],
+                            state.provisionalVelZ[neighbor] - state.provisionalVelZ[i]
+                        );
+                        xsph += neighborVelocity * kernel;
 
-                density_[i] = density;
+                        const float distance = std::sqrt(std::max(distanceSquared, kEpsilon));
+                        const float q = glm::clamp(1.0f - distance / settings_.smoothingLength, 0.0f, 1.0f);
+                        if (q > 0.0f) {
+                            const glm::vec3 radialDirection(dx, dy, dz);
+                            const glm::vec3 normalizedDirection = radialDirection / distance;
+                            const float radialVelocity = glm::dot(-neighborVelocity, normalizedDirection);
+                            if (radialVelocity < 0.0f) {
+                                const float approachSpeed = -radialVelocity;
+                                const float viscosityImpulse =
+                                    deltaTime *
+                                    q *
+                                    (settings_.viscosityLinear * approachSpeed +
+                                     settings_.viscosityQuadratic * approachSpeed * approachSpeed);
+                                pairwiseViscosity += normalizedDirection * (0.5f * viscosityImpulse);
+                            }
+                        }
+                        ++localNeighbors;
+                    }
+                );
+
+                state.density[i] = density;
                 const float densityRatio = density / restDensity;
                 const float densityError = std::abs(densityRatio - 1.0f);
+                const float divergenceError = std::abs(state.divergenceError[i]);
 
-                const glm::vec3 projectedVelocity(
-                    (predX_[i] - posX_[i]) / std::max(deltaTime, kEpsilon),
-                    (predY_[i] - posY_[i]) / std::max(deltaTime, kEpsilon),
-                    (predZ_[i] - posZ_[i]) / std::max(deltaTime, kEpsilon)
-                );
                 glm::vec3 relaxedVelocity =
-                    previousVelocity +
+                    glm::mix(previousVelocity, baseVelocity, settings_.velocityTransfer) +
+                    pairwiseViscosity +
                     xsph * (settings_.xsphViscosity * settings_.particleMass / std::max(density, kEpsilon));
-                glm::vec3 newVelocity =
-                    glm::mix(relaxedVelocity, projectedVelocity, settings_.velocityTransfer);
 
-                const float projectedSpeed = glm::length(projectedVelocity);
+                const float projectedSpeed = glm::length(baseVelocity);
                 const float quietSpeedWeight =
                     glm::clamp(1.0f - projectedSpeed / kQuietSpeedThreshold, 0.0f, 1.0f);
                 const float quietDensityWeight =
                     glm::clamp(1.0f - densityError / kQuietDensityErrorThreshold, 0.0f, 1.0f);
                 const float quietWeight = quietSpeedWeight * quietDensityWeight;
-                newVelocity *= std::exp(-settings_.restVelocityDamping * quietWeight * deltaTime);
+                relaxedVelocity *= std::exp(-settings_.restVelocityDamping * quietWeight * deltaTime);
 
-                if (predicted.x <= minX + kEpsilon && newVelocity.x < 0.0f) {
-                    newVelocity.x = -newVelocity.x * settings_.boundaryRestitution;
-                    newVelocity.y *= tangentialScale;
-                    newVelocity.z *= tangentialScale;
-                } else if (predicted.x >= maxX - kEpsilon && newVelocity.x > 0.0f) {
-                    newVelocity.x = -newVelocity.x * settings_.boundaryRestitution;
-                    newVelocity.y *= tangentialScale;
-                    newVelocity.z *= tangentialScale;
+                if (predicted.x <= minX + kEpsilon && relaxedVelocity.x < 0.0f) {
+                    relaxedVelocity.x = -relaxedVelocity.x * settings_.boundaryRestitution;
+                    relaxedVelocity.y *= tangentialScale;
+                    relaxedVelocity.z *= tangentialScale;
+                } else if (predicted.x >= maxX - kEpsilon && relaxedVelocity.x > 0.0f) {
+                    relaxedVelocity.x = -relaxedVelocity.x * settings_.boundaryRestitution;
+                    relaxedVelocity.y *= tangentialScale;
+                    relaxedVelocity.z *= tangentialScale;
                 }
 
-                if (predicted.y <= minY + kEpsilon && newVelocity.y < 0.0f) {
-                    newVelocity.y = -newVelocity.y * settings_.boundaryRestitution;
-                    newVelocity.x *= tangentialScale;
-                    newVelocity.z *= tangentialScale;
-                    if (std::abs(newVelocity.y) < 0.04f) {
-                        newVelocity.y = 0.0f;
+                if (predicted.y <= minY + kEpsilon && relaxedVelocity.y < 0.0f) {
+                    relaxedVelocity.y = -relaxedVelocity.y * settings_.boundaryRestitution;
+                    relaxedVelocity.x *= tangentialScale;
+                    relaxedVelocity.z *= tangentialScale;
+                    if (std::abs(relaxedVelocity.y) < 0.04f) {
+                        relaxedVelocity.y = 0.0f;
                     }
-                } else if (predicted.y >= maxY - kEpsilon && newVelocity.y > 0.0f) {
-                    newVelocity.y = -newVelocity.y * settings_.boundaryRestitution;
-                    newVelocity.x *= tangentialScale;
-                    newVelocity.z *= tangentialScale;
                 }
 
-                if (predicted.z <= minZ + kEpsilon && newVelocity.z < 0.0f) {
-                    newVelocity.z = -newVelocity.z * settings_.boundaryRestitution;
-                    newVelocity.x *= tangentialScale;
-                    newVelocity.y *= tangentialScale;
-                } else if (predicted.z >= maxZ - kEpsilon && newVelocity.z > 0.0f) {
-                    newVelocity.z = -newVelocity.z * settings_.boundaryRestitution;
-                    newVelocity.x *= tangentialScale;
-                    newVelocity.y *= tangentialScale;
+                if (predicted.z <= minZ + kEpsilon && relaxedVelocity.z < 0.0f) {
+                    relaxedVelocity.z = -relaxedVelocity.z * settings_.boundaryRestitution;
+                    relaxedVelocity.x *= tangentialScale;
+                    relaxedVelocity.y *= tangentialScale;
+                } else if (predicted.z >= maxZ - kEpsilon && relaxedVelocity.z > 0.0f) {
+                    relaxedVelocity.z = -relaxedVelocity.z * settings_.boundaryRestitution;
+                    relaxedVelocity.x *= tangentialScale;
+                    relaxedVelocity.y *= tangentialScale;
                 }
 
-                newVelocity *= std::exp(-settings_.boundaryDamping * quietWeight * deltaTime * 0.65f);
+                relaxedVelocity *= std::exp(-settings_.boundaryDamping * quietWeight * deltaTime * 0.65f);
 
-                const float speed = glm::length(newVelocity);
+                const float speed = glm::length(relaxedVelocity);
                 if (speed > settings_.maxSpeed && speed > kEpsilon) {
-                    newVelocity *= settings_.maxSpeed / speed;
+                    relaxedVelocity *= settings_.maxSpeed / speed;
                 }
 
-                posX_[i] = predX_[i];
-                posY_[i] = predY_[i];
-                posZ_[i] = predZ_[i];
-                velX_[i] = newVelocity.x;
-                velY_[i] = newVelocity.y;
-                velZ_[i] = newVelocity.z;
+                state.posX[i] = state.predX[i];
+                state.posY[i] = state.predY[i];
+                state.posZ[i] = state.predZ[i];
+                state.velX[i] = relaxedVelocity.x;
+                state.velY[i] = relaxedVelocity.y;
+                state.velZ[i] = relaxedVelocity.z;
 
-                densityMetric_[i] = glm::clamp(densityRatio, 0.0f, 2.0f);
-                speedMetric_[i] = glm::clamp(speed / std::max(settings_.maxSpeed, kEpsilon), 0.0f, 1.0f);
-                pressureMetric_[i] = glm::clamp(densityError * 1.5f + quietWeight * 0.05f, 0.0f, 1.0f);
+                state.densityMetric[i] = glm::clamp(densityRatio, 0.0f, 2.0f);
+                state.speedMetric[i] = glm::clamp(speed / std::max(settings_.maxSpeed, kEpsilon), 0.0f, 1.0f);
+                state.pressureMetric[i] =
+                    glm::clamp(densityError * 1.2f + divergenceError * 0.8f + quietWeight * 0.05f, 0.0f, 1.0f);
 
                 const float churn =
-                    glm::clamp((densityRatio - 0.95f) * 0.45f + speedMetric_[i] * 0.22f, 0.0f, 1.0f);
-                foam_[i] = std::max(foam_[i] * foamDamping, churn);
-                interactionHeat_[i] *= std::exp(-settings_.foamDecay * deltaTime);
-                interactionMetric_[i] = glm::clamp(std::max(interactionHeat_[i], foam_[i] * 0.45f), 0.0f, 1.0f);
+                    glm::clamp((densityRatio - 0.95f) * 0.45f + state.speedMetric[i] * 0.22f, 0.0f, 1.0f);
+                state.foam[i] = std::max(state.foam[i] * foamDamping, churn);
+                state.interactionHeat[i] *= std::exp(-settings_.foamDecay * deltaTime);
+                state.interactionMetric[i] =
+                    glm::clamp(std::max(state.interactionHeat[i], state.foam[i] * 0.45f), 0.0f, 1.0f);
             }
             neighborCounter.fetch_add(localNeighbors, std::memory_order_relaxed);
         }
@@ -616,19 +877,22 @@ void WaterSimulation::computeFinalState(float deltaTime, std::size_t& neighborSa
 
     float densitySum = 0.0f;
     float densityErrorSum = 0.0f;
+    float divergenceErrorSum = 0.0f;
     float maxObservedSpeed = 0.0f;
-    for (std::size_t i = 0; i < posX_.size(); ++i) {
-        densitySum += density_[i];
-        densityErrorSum += std::abs(density_[i] - restDensity) / restDensity;
+    for (std::size_t i = 0; i < state.posX.size(); ++i) {
+        densitySum += state.density[i];
+        densityErrorSum += std::abs(state.density[i] - restDensity) / restDensity;
+        divergenceErrorSum += std::abs(state.divergenceError[i]);
         maxObservedSpeed = std::max(
             maxObservedSpeed,
-            std::sqrt(velX_[i] * velX_[i] + velY_[i] * velY_[i] + velZ_[i] * velZ_[i])
+            std::sqrt(state.velX[i] * state.velX[i] + state.velY[i] * state.velY[i] + state.velZ[i] * state.velZ[i])
         );
     }
 
-    const float particleCountFloat = static_cast<float>(std::max<std::size_t>(posX_.size(), 1));
+    const float particleCountFloat = static_cast<float>(std::max<std::size_t>(state.posX.size(), 1));
     stats_.averageDensity = densitySum / particleCountFloat;
     stats_.averageDensityError = densityErrorSum / particleCountFloat;
+    stats_.averageDivergenceError = divergenceErrorSum / particleCountFloat;
     stats_.maxSpeed = maxObservedSpeed;
 }
 
@@ -660,10 +924,15 @@ void WaterSimulation::step(float deltaTime) {
     stats_.gridBuildMs = 0.0f;
     stats_.densityPassMs = 0.0f;
     stats_.constraintPassMs = 0.0f;
+    stats_.divergencePassMs = 0.0f;
     stats_.integrateMs = 0.0f;
     stats_.finalizeMs = 0.0f;
     stats_.snapshotMs = 0.0f;
     stats_.simulatedDeltaTime = glm::clamp(deltaTime, kMinDeltaTime, kMaxDeltaTime);
+    stats_.executedDivergenceIterations = 0;
+    stats_.snapshotInterval = 1;
+    stats_.averageDivergenceError = 0.0f;
+    stats_.realTimeRatio = 1.0f;
 
     const float clampedDeltaTime = stats_.simulatedDeltaTime;
     const float safeTravel = std::max(settings_.cflFactor * settings_.smoothingLength, settings_.particleRadius * 0.5f);
@@ -677,42 +946,70 @@ void WaterSimulation::step(float deltaTime) {
     );
     stats_.executedSubsteps = effectiveSubsteps;
     stats_.executedSolverIterations = settings_.pressureIterations;
+    stats_.executedDivergenceIterations = std::max(1, settings_.pressureIterations / 2);
     const float substepDelta = clampedDeltaTime / static_cast<float>(effectiveSubsteps);
 
     for (int substep = 0; substep < effectiveSubsteps; ++substep) {
+        auto& state = activeState_;
         auto phaseStart = Clock::now();
         integratePredictedPositions(substepDelta);
         stats_.integrateMs += toMilliseconds(Clock::now() - phaseStart);
 
+        std::fill(state.densityPressure.begin(), state.densityPressure.end(), 0.0f);
+        std::fill(state.divergencePressure.begin(), state.divergencePressure.end(), 0.0f);
+        std::fill(state.divergenceError.begin(), state.divergenceError.end(), 0.0f);
+
+        std::size_t neighborSamples = 0;
         for (int iteration = 0; iteration < settings_.pressureIterations; ++iteration) {
             phaseStart = Clock::now();
-            rebuildSpatialGrid(predX_, predY_, predZ_);
+            rebuildSpatialGrid(state.predX, state.predY, state.predZ);
             stats_.gridBuildMs += toMilliseconds(Clock::now() - phaseStart);
 
-            std::size_t neighborSamples = 0;
             phaseStart = Clock::now();
-            computeDensityAndLambdas(neighborSamples);
+            computeDensityAndAlpha(neighborSamples);
             stats_.densityPassMs += toMilliseconds(Clock::now() - phaseStart);
 
             phaseStart = Clock::now();
-            computePositionCorrections(substepDelta);
+            solveDensityPressureIteration();
             applyPredictedCorrections();
             stats_.constraintPassMs += toMilliseconds(Clock::now() - phaseStart);
-            stats_.neighborSamples += neighborSamples;
         }
+        stats_.neighborSamples += neighborSamples;
 
         phaseStart = Clock::now();
-        rebuildSpatialGrid(predX_, predY_, predZ_);
+        rebuildSpatialGrid(state.predX, state.predY, state.predZ);
         stats_.gridBuildMs += toMilliseconds(Clock::now() - phaseStart);
 
-        std::size_t neighborSamples = 0;
+        std::fill(state.divergencePressure.begin(), state.divergencePressure.end(), 0.0f);
+
+        phaseStart = Clock::now();
+        updateProvisionalVelocities(substepDelta);
+        stats_.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+
+        neighborSamples = 0;
+        phaseStart = Clock::now();
+        computeDivergenceAndAlpha(substepDelta, neighborSamples);
+        stats_.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+        for (int iteration = 0; iteration < stats_.executedDivergenceIterations; ++iteration) {
+            if (iteration > 0) {
+                phaseStart = Clock::now();
+                computeDivergenceAndAlpha(substepDelta, neighborSamples);
+                stats_.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+            }
+
+            phaseStart = Clock::now();
+            solveDivergenceIteration(substepDelta);
+            stats_.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+        }
+        stats_.neighborSamples += neighborSamples;
+
+        neighborSamples = 0;
         phaseStart = Clock::now();
         computeFinalState(substepDelta, neighborSamples);
         stats_.finalizeMs += toMilliseconds(Clock::now() - phaseStart);
         stats_.neighborSamples += neighborSamples;
     }
 
-    rebuildSpatialGrid(posX_, posY_, posZ_);
     updateDerivedState();
     stats_.totalStepMs = toMilliseconds(Clock::now() - totalStart);
 }
@@ -762,6 +1059,7 @@ void WaterSimulation::addImpulse(
     const glm::vec3 maxPoint = center + glm::vec3(clampedRadius);
     const glm::ivec3 minCell = positionToCell(minPoint.x, minPoint.y, minPoint.z);
     const glm::ivec3 maxCell = positionToCell(maxPoint.x, maxPoint.y, maxPoint.z);
+    auto& state = activeState_;
 
     for (int z = minCell.z; z <= maxCell.z; ++z) {
         for (int y = minCell.y; y <= maxCell.y; ++y) {
@@ -770,12 +1068,11 @@ void WaterSimulation::addImpulse(
                 for (int entry = cellStarts_[static_cast<std::size_t>(cellIndex)];
                      entry < cellStarts_[static_cast<std::size_t>(cellIndex) + 1];
                      ++entry) {
-                    const std::size_t particleIndex =
-                        static_cast<std::size_t>(sortedParticleIndices_[static_cast<std::size_t>(entry)]);
+                    const std::size_t particleIndex = static_cast<std::size_t>(entry);
                     const glm::vec3 offset(
-                        posX_[particleIndex] - center.x,
-                        posY_[particleIndex] - center.y,
-                        posZ_[particleIndex] - center.z
+                        state.posX[particleIndex] - center.x,
+                        state.posY[particleIndex] - center.y,
+                        state.posZ[particleIndex] - center.z
                     );
                     const float distanceSquared = glm::dot(offset, offset);
                     if (distanceSquared > radiusSquared) {
@@ -788,24 +1085,25 @@ void WaterSimulation::addImpulse(
                     const glm::vec3 swirl =
                         glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), offset) * (0.055f * influence);
 
-                    velX_[particleIndex] += (directionalImpulse.x + swirl.x) * influence;
-                    velY_[particleIndex] += (directionalImpulse.y + swirl.y) * influence;
-                    velZ_[particleIndex] += (directionalImpulse.z + swirl.z) * influence;
+                    state.velX[particleIndex] += (directionalImpulse.x + swirl.x) * influence;
+                    state.velY[particleIndex] += (directionalImpulse.y + swirl.y) * influence;
+                    state.velZ[particleIndex] += (directionalImpulse.z + swirl.z) * influence;
 
                     const float speed = std::sqrt(
-                        velX_[particleIndex] * velX_[particleIndex] +
-                        velY_[particleIndex] * velY_[particleIndex] +
-                        velZ_[particleIndex] * velZ_[particleIndex]
+                        state.velX[particleIndex] * state.velX[particleIndex] +
+                        state.velY[particleIndex] * state.velY[particleIndex] +
+                        state.velZ[particleIndex] * state.velZ[particleIndex]
                     );
                     if (speed > settings_.maxSpeed && speed > kEpsilon) {
                         const float scale = settings_.maxSpeed / speed;
-                        velX_[particleIndex] *= scale;
-                        velY_[particleIndex] *= scale;
-                        velZ_[particleIndex] *= scale;
+                        state.velX[particleIndex] *= scale;
+                        state.velY[particleIndex] *= scale;
+                        state.velZ[particleIndex] *= scale;
                     }
 
-                    interactionHeat_[particleIndex] = std::max(interactionHeat_[particleIndex], influence * 0.85f);
-                    foam_[particleIndex] = std::max(foam_[particleIndex], influence * 0.55f);
+                    state.interactionHeat[particleIndex] =
+                        std::max(state.interactionHeat[particleIndex], influence * 0.85f);
+                    state.foam[particleIndex] = std::max(state.foam[particleIndex], influence * 0.55f);
                 }
             }
         }
@@ -818,14 +1116,16 @@ void WaterSimulation::buildRenderSnapshot(WaterRenderSnapshot& snapshot) const {
         return;
     }
 
-    snapshot.particles.resize(posX_.size());
-    for (std::size_t i = 0; i < posX_.size(); ++i) {
-        snapshot.particles[i].position = glm::vec3(posX_[i], posY_[i], posZ_[i]);
-        snapshot.particles[i].metrics = glm::vec4(
-            densityMetric_[i],
-            speedMetric_[i],
-            pressureMetric_[i],
-            interactionMetric_[i]
+    const auto& state = activeState_;
+    snapshot.particles.resize(state.posX.size());
+    for (std::size_t i = 0; i < state.posX.size(); ++i) {
+        const std::size_t stableIndex = static_cast<std::size_t>(state.stableParticleIds[i]);
+        snapshot.particles[stableIndex].position = glm::vec3(state.posX[i], state.posY[i], state.posZ[i]);
+        snapshot.particles[stableIndex].metrics = glm::vec4(
+            state.densityMetric[i],
+            state.speedMetric[i],
+            state.pressureMetric[i],
+            state.interactionMetric[i]
         );
     }
 
@@ -891,28 +1191,29 @@ std::size_t WaterSimulation::particleCount() const {
     if (activeBackend_ == SimulationBackend::Metal && metalBackend_ != nullptr) {
         return metalBackend_->particleCount();
     }
-    return posX_.size();
+    return activeState_.posX.size();
 }
 
 void WaterSimulation::enforceBounds(float& x, float& y, float& z) const {
     x = glm::clamp(x, -halfDomain_ + settings_.particleRadius, halfDomain_ - settings_.particleRadius);
-    y = glm::clamp(y, settings_.containerFloorY + settings_.particleRadius, settings_.containerLipY - settings_.particleRadius);
+    y = std::max(y, settings_.containerFloorY + settings_.particleRadius);
     z = glm::clamp(z, -halfDomain_ + settings_.particleRadius, halfDomain_ - settings_.particleRadius);
 }
 
 void WaterSimulation::updateDerivedState() {
-    if (posY_.empty()) {
+    const auto& state = activeState_;
+    if (state.posY.empty()) {
         interactionPlaneY_ = settings_.containerFloorY + settings_.particleRadius * 3.0f;
         return;
     }
 
     float averageY = 0.0f;
-    float maxY = posY_.front();
-    for (float y : posY_) {
+    float maxY = state.posY.front();
+    for (float y : state.posY) {
         averageY += y;
         maxY = std::max(maxY, y);
     }
-    averageY /= static_cast<float>(posY_.size());
+    averageY /= static_cast<float>(state.posY.size());
 
     interactionPlaneY_ = glm::clamp(
         glm::mix(averageY + settings_.smoothingLength * 0.8f, maxY - settings_.particleRadius * 0.4f, 0.28f),

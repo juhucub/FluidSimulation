@@ -65,5 +65,3 @@ Run the Metal benchmark path:
 - Use `build/` for day-to-day iteration.
 - Use `build-perf/` when comparing timing output or profiling.
 - Use `build-release/` for cleaner release-style builds.
-- Avoid treating generated directories as source artifacts.
-- Keep user-facing docs and scripts pointing at neutral build names rather than tool-specific folders.

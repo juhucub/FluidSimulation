@@ -55,13 +55,6 @@ cmake --build --preset perf
 ./build-perf/FluidSimulation
 ```
 
-Release build:
-
-```bash
-cmake --preset release
-cmake --build --preset release
-./build-release/FluidSimulation
-```
 
 ## Run Modes
 
@@ -89,6 +82,16 @@ Metal benchmark:
 ./build-perf/FluidSimulation --benchmark --metal
 ```
 
+Run a specific benchmark scene:
+
+```bash
+./build-perf/FluidSimulation --benchmark --benchmark-scene calm-rest
+./build-perf/FluidSimulation --benchmark --benchmark-scene repeated-impulse
+./build-perf/FluidSimulation --benchmark --benchmark-scene wall-slash
+```
+
+Available benchmark scenes are `steady-state`, `calm-rest`, `repeated-impulse`, `wall-slash`, and `all`.
+
 ## Documentation
 
 - [App Functionality](./docs/APP_FUNCTIONALITY.md)
@@ -99,16 +102,11 @@ Metal benchmark:
 ## Current Architecture
 
 - CPU backend:
-  SoA particle storage, counting-sort uniform grid, threaded simulation worker, compact render snapshots.
+  Cell-reordered SoA particle storage, counting-sort uniform grid, threaded simulation worker, compact render snapshots.
 - Metal backend:
-  Metal compute kernels for integration, grid assignment, density/lambda solve, correction, and finalization.
+  Metal compute kernels for integration, GPU grid scan, density/divergence solve stages, and finalization.
 - Renderer:
   OpenGL point-sprite water rendering with compact per-particle metrics.
 - UI:
   ImGui-driven controls for structure, solver tuning, quality policy, backend selection, and diagnostics.
 
-## Repository Notes
-
-- Build directories and app runtime files are ignored in Git through `.gitignore`.
-- Use presets for consistent local builds instead of ad hoc build-folder names.
-- Source-of-truth implementation files currently live in organized subfolders under `include/`, `src/`, `resources/`, and `docs/`.

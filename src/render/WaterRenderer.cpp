@@ -60,23 +60,16 @@ void WaterRenderer::updateSurface(const WaterRenderSnapshot& snapshot) {
     particleWorldRadius_ = snapshot.particleRadius;
     particleCount_ = snapshot.particles.size();
 
-    glBindBuffer(GL_ARRAY_BUFFER, particleVbo_);
-    glBufferData(
-        GL_ARRAY_BUFFER,
-        static_cast<GLsizeiptr>(particleCapacity_ * sizeof(ParticleVertex)),
-        nullptr,
-        GL_STREAM_DRAW
-    );
-
     if (particleCount_ == 0) {
         return;
     }
 
+    glBindBuffer(GL_ARRAY_BUFFER, particleVbo_);
     void* mappedMemory = glMapBufferRange(
         GL_ARRAY_BUFFER,
         0,
         static_cast<GLsizeiptr>(particleCount_ * sizeof(ParticleVertex)),
-        GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT
+        GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT
     );
     if (mappedMemory != nullptr) {
         std::memcpy(mappedMemory, snapshot.particles.data(), particleCount_ * sizeof(ParticleVertex));

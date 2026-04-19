@@ -38,33 +38,14 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
+  # Include the install script for each subdirectory.
   include("/Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/glfw-3.4/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/glad/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/stb_image/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/stb_truetype/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/glm/cmake_install.cmake")
-endif()
-
-if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  # Include the install script for the subdirectory.
   include("/Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/imgui-docking/cmake_install.cmake")
+
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)

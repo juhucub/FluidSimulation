@@ -2,26 +2,29 @@
 
 ## Current Optimizations
 
-- Structure-of-arrays particle state for hot-loop memory access.
-- Counting-sort uniform grid for neighbor locality.
+- Cell-reordered structure-of-arrays particle state for CPU hot-loop locality.
+- Counting-sort uniform grid with cell starts, counts, and direct contiguous neighbor walks.
 - Multithreaded CPU passes for integration and solver work.
 - Compact render snapshot payloads instead of full solver state exposure.
 - Metal compute backend for GPU execution on macOS.
-- Separate benchmark mode for repeatable timing runs.
+- GPU-side exclusive scan for the Metal grid prefix-sum stage.
+- Split density and divergence solver stages for a DFSPH-compatible path on both backends.
+- Separate benchmark mode with deterministic scene presets for repeatable timing runs.
 
 ## Recommended Next Routes
 
 ### CPU Path
 
-- Reuse temporary allocations inside grid rebuild and prefix-sum stages.
-- Reduce repeated full-neighbor traversals where metrics can be shared safely.
-- Add benchmark scene presets for calm-rest, repeated impulse, and wall-slash cases.
-- Profile thread chunk sizing against particle count and core count.
+- Reduce reorder payload and reorder frequency inside density iterations without giving back the stability gained from corrected-prediction rebuilds.
+- Reuse density and divergence warm-start state more aggressively when the local density error is already low.
+- Profile thread chunk sizing against particle count and core count now that hot loops walk cell-local buffers directly.
+- Consider staged early-out criteria for density and divergence iterations once regression coverage over the new scenes is stronger.
 
 ### Metal Path
 
-- Move the grid prefix-sum stage fully onto GPU if profiling shows the CPU shared-memory prefix sum as a bottleneck.
+- Tune scan block sizing and command-buffer batching now that the grid prefix sum is on GPU.
 - Add indirect command or batched dispatch tuning for large particle counts.
+- Reduce shared-buffer CPU touches further so the GPU path spends less time waiting on host-side stats reads.
 - Expand GPU-side instrumentation if deeper backend timing visibility becomes necessary.
 
 ### Rendering Path
@@ -41,6 +44,7 @@
 Use `--benchmark` and `--benchmark --metal` as the baseline verification loop whenever changing:
 
 - particle counts
+- benchmark scenes
 - smoothing length
 - rest density
 - damping and viscosity

@@ -65,6 +65,7 @@ struct SimulationStats {
     float gridBuildMs = 0.0f;
     float densityPassMs = 0.0f;
     float constraintPassMs = 0.0f;
+    float divergencePassMs = 0.0f;
     float integrateMs = 0.0f;
     float finalizeMs = 0.0f;
     float snapshotMs = 0.0f;
@@ -72,9 +73,13 @@ struct SimulationStats {
     float simulatedDeltaTime = 0.0f;
     int executedSubsteps = 0;
     int executedSolverIterations = 0;
+    int executedDivergenceIterations = 0;
+    int snapshotInterval = 1;
     float averageDensity = 0.0f;
     float averageDensityError = 0.0f;
+    float averageDivergenceError = 0.0f;
     float maxSpeed = 0.0f;
+    float realTimeRatio = 1.0f;
 };
 
 struct WaterRenderParticle {
@@ -120,14 +125,50 @@ public:
 
 private:
     struct WorkerPool;
+    struct ParticleSoA {
+        std::vector<float> posX;
+        std::vector<float> posY;
+        std::vector<float> posZ;
+        std::vector<float> predX;
+        std::vector<float> predY;
+        std::vector<float> predZ;
+        std::vector<float> velX;
+        std::vector<float> velY;
+        std::vector<float> velZ;
+        std::vector<float> provisionalVelX;
+        std::vector<float> provisionalVelY;
+        std::vector<float> provisionalVelZ;
+        std::vector<float> density;
+        std::vector<float> alpha;
+        std::vector<float> densityPressure;
+        std::vector<float> divergencePressure;
+        std::vector<float> densityError;
+        std::vector<float> divergenceError;
+        std::vector<float> deltaX;
+        std::vector<float> deltaY;
+        std::vector<float> deltaZ;
+        std::vector<float> speedMetric;
+        std::vector<float> densityMetric;
+        std::vector<float> pressureMetric;
+        std::vector<float> interactionMetric;
+        std::vector<float> foam;
+        std::vector<float> interactionHeat;
+        std::vector<int> stableParticleIds;
+        std::vector<int> cellIndices;
+
+        void resize(std::size_t particleCount, float restDensity);
+    };
 
     void sanitizeSettings();
     void updateConfiguration();
     void rebuildSpatialGrid(const std::vector<float>& xs, const std::vector<float>& ys, const std::vector<float>& zs);
     void integratePredictedPositions(float deltaTime);
-    void computeDensityAndLambdas(std::size_t& neighborSamples);
-    void computePositionCorrections(float deltaTime);
+    void computeDensityAndAlpha(std::size_t& neighborSamples);
+    void solveDensityPressureIteration();
     void applyPredictedCorrections();
+    void updateProvisionalVelocities(float deltaTime);
+    void computeDivergenceAndAlpha(float deltaTime, std::size_t& neighborSamples);
+    void solveDivergenceIteration(float deltaTime);
     void computeFinalState(float deltaTime, std::size_t& neighborSamples);
     void enforceBounds(float& x, float& y, float& z) const;
     void updateDerivedState();
@@ -138,6 +179,7 @@ private:
     template <typename Func>
     void forEachNeighbor(
         std::size_t particleIndex,
+        const ParticleSoA& state,
         const std::vector<float>& xs,
         const std::vector<float>& ys,
         const std::vector<float>& zs,
@@ -156,30 +198,16 @@ private:
     float interactionPlaneY_;
     float spawnTopY_;
 
-    std::vector<float> posX_;
-    std::vector<float> posY_;
-    std::vector<float> posZ_;
-    std::vector<float> predX_;
-    std::vector<float> predY_;
-    std::vector<float> predZ_;
-    std::vector<float> velX_;
-    std::vector<float> velY_;
-    std::vector<float> velZ_;
-    std::vector<float> density_;
-    std::vector<float> lambda_;
-    std::vector<float> deltaX_;
-    std::vector<float> deltaY_;
-    std::vector<float> deltaZ_;
-    std::vector<float> speedMetric_;
-    std::vector<float> densityMetric_;
-    std::vector<float> pressureMetric_;
-    std::vector<float> interactionMetric_;
-    std::vector<float> foam_;
-    std::vector<float> interactionHeat_;
-    std::vector<int> particleCellIndices_;
+    ParticleSoA activeState_;
+    ParticleSoA scratchState_;
     std::vector<int> cellCounts_;
     std::vector<int> cellStarts_;
-    std::vector<int> sortedParticleIndices_;
+    std::vector<int> cellWriteHeads_;
+    float smoothingLengthSquared_;
+    float poly6Coefficient_;
+    float spikyGradientCoefficient_;
+    float selfDensityKernel_;
+    float correctionReferenceKernel_;
     WorkerPool* workerPool_;
     MetalSimulationBackend* metalBackend_;
     SimulationBackend activeBackend_;
@@ -188,22 +216,28 @@ private:
 template <typename Func>
 void WaterSimulation::forEachNeighbor(
     std::size_t particleIndex,
+    const ParticleSoA& state,
     const std::vector<float>& xs,
     const std::vector<float>& ys,
     const std::vector<float>& zs,
     Func&& func
 ) const {
-    const glm::ivec3 baseCell = positionToCell(xs[particleIndex], ys[particleIndex], zs[particleIndex]);
+    const int baseCellIndex = state.cellIndices[particleIndex];
+    const int cellsPerLayer = gridResolutionX_ * gridResolutionY_;
+    const int baseZ = baseCellIndex / cellsPerLayer;
+    const int baseRemainder = baseCellIndex - baseZ * cellsPerLayer;
+    const int baseY = baseRemainder / gridResolutionX_;
+    const int baseX = baseRemainder - baseY * gridResolutionX_;
 
-    for (int z = baseCell.z - 1; z <= baseCell.z + 1; ++z) {
+    for (int z = baseZ - 1; z <= baseZ + 1; ++z) {
         if (z < 0 || z >= gridResolutionZ_) {
             continue;
         }
-        for (int y = baseCell.y - 1; y <= baseCell.y + 1; ++y) {
+        for (int y = baseY - 1; y <= baseY + 1; ++y) {
             if (y < 0 || y >= gridResolutionY_) {
                 continue;
             }
-            for (int x = baseCell.x - 1; x <= baseCell.x + 1; ++x) {
+            for (int x = baseX - 1; x <= baseX + 1; ++x) {
                 if (x < 0 || x >= gridResolutionX_) {
                     continue;
                 }
@@ -212,8 +246,7 @@ void WaterSimulation::forEachNeighbor(
                 for (int entry = cellStarts_[static_cast<std::size_t>(cellIndex)];
                      entry < cellStarts_[static_cast<std::size_t>(cellIndex) + 1];
                      ++entry) {
-                    const std::size_t neighborIndex =
-                        static_cast<std::size_t>(sortedParticleIndices_[static_cast<std::size_t>(entry)]);
+                    const std::size_t neighborIndex = static_cast<std::size_t>(entry);
                     if (neighborIndex == particleIndex) {
                         continue;
                     }
@@ -222,7 +255,7 @@ void WaterSimulation::forEachNeighbor(
                     const float dy = ys[particleIndex] - ys[neighborIndex];
                     const float dz = zs[particleIndex] - zs[neighborIndex];
                     const float distanceSquared = dx * dx + dy * dy + dz * dz;
-                    if (distanceSquared >= cellSize_ * cellSize_) {
+                    if (distanceSquared >= smoothingLengthSquared_) {
                         continue;
                     }
 

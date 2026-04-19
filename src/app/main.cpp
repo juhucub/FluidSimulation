@@ -34,6 +34,7 @@ constexpr unsigned int kInitialWidth = 1440;
 constexpr unsigned int kInitialHeight = 900;
 constexpr float kFixedSimulationStep = 1.0f / 120.0f;
 constexpr float kStartupRippleDelay = 0.18f;
+constexpr int kMaxCatchUpSteps = 4;
 
 struct WaterStrokeState {
     bool active = false;
@@ -78,6 +79,31 @@ int chooseSnapshotInterval(const WaterSimulationSettings& settings, const Simula
         return 2;
     }
     return 1;
+}
+
+bool canInterpolateSnapshots(const WaterRenderSnapshot& from, const WaterRenderSnapshot& to) {
+    return from.particles.size() == to.particles.size() && !to.particles.empty() && to.version >= from.version;
+}
+
+void interpolateRenderSnapshot(
+    const WaterRenderSnapshot& from,
+    const WaterRenderSnapshot& to,
+    float alpha,
+    WaterRenderSnapshot& out
+) {
+    const float clampedAlpha = glm::clamp(alpha, 0.0f, 1.0f);
+    out.particles.resize(to.particles.size());
+    for (std::size_t i = 0; i < to.particles.size(); ++i) {
+        out.particles[i].position = glm::mix(from.particles[i].position, to.particles[i].position, clampedAlpha);
+        out.particles[i].metrics = glm::mix(from.particles[i].metrics, to.particles[i].metrics, clampedAlpha);
+    }
+
+    out.particleRadius = glm::mix(from.particleRadius, to.particleRadius, clampedAlpha);
+    out.interactionPlaneY = glm::mix(from.interactionPlaneY, to.interactionPlaneY, clampedAlpha);
+    out.halfDomainSize = glm::mix(from.halfDomainSize, to.halfDomainSize, clampedAlpha);
+    out.containerFloorY = glm::mix(from.containerFloorY, to.containerFloorY, clampedAlpha);
+    out.containerLipY = glm::mix(from.containerLipY, to.containerLipY, clampedAlpha);
+    out.version = to.version;
 }
 
 enum class WaterBehaviorPreset {
@@ -264,13 +290,17 @@ public:
 
 private:
     void run() {
-        auto nextStepTime = Clock::now();
+        auto previousTick = Clock::now();
+        float accumulator = 0.0f;
+        float accumulatedWallTime = 0.0f;
+        float accumulatedSimulatedTime = 0.0f;
         while (true) {
             WaterSimulationSettings nextSettings;
             std::vector<ImpulseCommand> impulses;
             bool shouldReset = false;
             bool shouldExit = false;
             bool applySettings = false;
+            bool forcePublish = false;
 
             {
                 std::lock_guard<std::mutex> lock(mutex_);
@@ -292,43 +322,69 @@ private:
                 appliedSettings_ = nextSettings;
                 if (structuralReset) {
                     simulation_.reset();
+                    forcePublish = true;
+                    previousTick = Clock::now();
+                    accumulator = 0.0f;
+                    accumulatedWallTime = 0.0f;
+                    accumulatedSimulatedTime = 0.0f;
                 }
             }
 
             if (shouldReset) {
                 simulation_.reset();
+                forcePublish = true;
+                previousTick = Clock::now();
+                accumulator = 0.0f;
+                accumulatedWallTime = 0.0f;
+                accumulatedSimulatedTime = 0.0f;
             }
 
             for (const ImpulseCommand& command : impulses) {
                 simulation_.addImpulse(command.worldXZ, command.dragVelocity, command.heightDelta, command.radius);
             }
 
-            simulation_.step(kFixedSimulationStep);
+            const auto now = Clock::now();
+            float wallDelta = std::chrono::duration<float>(now - previousTick).count();
+            previousTick = now;
+            wallDelta = glm::clamp(wallDelta, 0.0f, 0.1f);
+            accumulatedWallTime += wallDelta;
+            accumulator = std::min(accumulator + wallDelta, kFixedSimulationStep * static_cast<float>(kMaxCatchUpSteps));
+
+            int executedSteps = 0;
+            while (accumulator >= kFixedSimulationStep && executedSteps < kMaxCatchUpSteps) {
+                simulation_.step(kFixedSimulationStep);
+                accumulator -= kFixedSimulationStep;
+                accumulatedSimulatedTime += kFixedSimulationStep;
+                ++executedSteps;
+            }
 
             const int snapshotInterval = chooseSnapshotInterval(appliedSettings_, simulation_.stats());
-            if (simulation_.stats().frameIndex % static_cast<std::uint64_t>(snapshotInterval) == 0 || shouldReset) {
-                WaterRenderSnapshot stagedSnapshot;
+            const float realTimeRatio =
+                accumulatedWallTime > 1.0e-5f ? accumulatedSimulatedTime / accumulatedWallTime : 1.0f;
+            if (forcePublish ||
+                (executedSteps > 0 &&
+                 simulation_.stats().frameIndex % static_cast<std::uint64_t>(snapshotInterval) == 0)) {
                 const auto snapshotStart = Clock::now();
-                simulation_.buildRenderSnapshot(stagedSnapshot);
+                simulation_.buildRenderSnapshot(stagingSnapshot_);
                 SimulationStats stagedStats = simulation_.stats();
                 stagedStats.snapshotMs =
                     std::chrono::duration<float, std::milli>(Clock::now() - snapshotStart).count();
+                stagedStats.snapshotInterval = snapshotInterval;
+                stagedStats.realTimeRatio = realTimeRatio;
 
                 std::lock_guard<std::mutex> lock(mutex_);
-                std::swap(publishedSnapshot_, stagedSnapshot);
+                std::swap(publishedSnapshot_, stagingSnapshot_);
                 publishedStats_ = stagedStats;
                 hasFreshSnapshot_ = true;
             } else {
                 std::lock_guard<std::mutex> lock(mutex_);
                 publishedStats_ = simulation_.stats();
+                publishedStats_.snapshotInterval = snapshotInterval;
+                publishedStats_.realTimeRatio = realTimeRatio;
             }
 
-            nextStepTime += std::chrono::duration_cast<Clock::duration>(std::chrono::duration<float>(kFixedSimulationStep));
-            const auto now = Clock::now();
-            if (now < nextStepTime) {
-                std::this_thread::sleep_until(nextStepTime);
-            } else {
-                nextStepTime = now;
+            if (executedSteps == 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
         }
     }
@@ -340,6 +396,7 @@ private:
     std::mutex mutex_;
     std::vector<ImpulseCommand> pendingImpulses_;
     WaterRenderSnapshot publishedSnapshot_;
+    WaterRenderSnapshot stagingSnapshot_;
     SimulationStats publishedStats_;
     bool running_ = true;
     std::atomic<bool> settingsDirty_{false};
@@ -459,14 +516,63 @@ bool shouldUseMetalBackend(int argc, char** argv) {
     return false;
 }
 
-void runBenchmarks(SimulationBackend backend) {
-    struct BenchmarkCase {
-        const char* label;
-        int x;
-        int y;
-        int z;
-    };
+std::string benchmarkSceneFilter(int argc, char** argv) {
+    for (int i = 1; i + 1 < argc; ++i) {
+        if (std::string(argv[i]) == "--benchmark-scene") {
+            return argv[i + 1];
+        }
+    }
+    return "all";
+}
 
+struct BenchmarkCase {
+    const char* label;
+    int x;
+    int y;
+    int z;
+};
+
+struct BenchmarkScene {
+    const char* name;
+    int warmupFrames;
+    int measuredFrames;
+    void (*applyStep)(WaterSimulation&, const WaterSimulationSettings&, int);
+};
+
+void benchmarkNoopStep(WaterSimulation&, const WaterSimulationSettings&, int) {}
+
+void benchmarkRepeatedImpulseStep(WaterSimulation& simulation, const WaterSimulationSettings& settings, int measuredFrame) {
+    if (measuredFrame % 24 != 0) {
+        return;
+    }
+
+    const float halfDomain = settings.domainSize * 0.5f;
+    const float direction = (measuredFrame / 24) % 2 == 0 ? 1.0f : -1.0f;
+    simulation.addImpulse(
+        glm::vec2(direction * halfDomain * 0.35f, 0.0f),
+        glm::vec2(direction * 0.9f, 0.0f),
+        -0.018f,
+        settings.interactionRadius * 1.1f
+    );
+}
+
+void benchmarkWallSlashStep(WaterSimulation& simulation, const WaterSimulationSettings& settings, int measuredFrame) {
+    const int cycleFrame = measuredFrame % 48;
+    if (cycleFrame >= 6) {
+        return;
+    }
+
+    const float halfDomain = settings.domainSize * 0.5f;
+    const float alpha = cycleFrame / 5.0f;
+    simulation.addImpulse(
+        glm::vec2(halfDomain * 0.82f, glm::mix(-halfDomain * 0.45f, halfDomain * 0.45f, alpha)),
+        glm::vec2(-settings.interactionMaxSpeed * 0.85f, settings.interactionMaxSpeed * 0.15f),
+        -0.012f,
+        settings.interactionRadius * 0.95f
+    );
+}
+
+int runBenchmarks(SimulationBackend backend, const std::string& sceneFilter) {
     const BenchmarkCase cases[] = {
         {"1k", 10, 10, 10},
         {"5k", 17, 17, 18},
@@ -474,67 +580,98 @@ void runBenchmarks(SimulationBackend backend) {
         {"32k", 32, 32, 32},
     };
 
+    const BenchmarkScene scenes[] = {
+        {"steady-state", 30, 90, benchmarkNoopStep},
+        {"calm-rest", 180, 180, benchmarkNoopStep},
+        {"repeated-impulse", 30, 150, benchmarkRepeatedImpulseStep},
+        {"wall-slash", 30, 150, benchmarkWallSlashStep},
+    };
+
     std::cout
-        << "label,particles,avg_step_ms,avg_grid_ms,avg_density_ms,avg_constraint_ms,avg_finalize_ms,avg_neighbors,avg_density_error,max_speed\n"
+        << "scene,label,particles,avg_step_ms,avg_grid_ms,avg_density_ms,avg_constraint_ms,avg_divergence_ms,avg_finalize_ms,avg_neighbors,avg_density_error,max_speed,avg_divergence_error\n"
         << std::flush;
-    for (const BenchmarkCase& benchmarkCase : cases) {
-        WaterSimulationSettings settings;
-        settings.particlesX = benchmarkCase.x;
-        settings.particlesY = benchmarkCase.y;
-        settings.particlesZ = benchmarkCase.z;
-        settings.qualityPolicy = SimulationQualityPolicy::FavorResponsiveness;
-        settings.backend = backend;
-        WaterSimulation simulation(settings);
-
-        for (int i = 0; i < 30; ++i) {
-            simulation.step(kFixedSimulationStep);
+    bool matchedScene = false;
+    for (const BenchmarkScene& scene : scenes) {
+        if (sceneFilter != "all" && sceneFilter != scene.name) {
+            continue;
         }
+        matchedScene = true;
 
-        float totalStepMs = 0.0f;
-        float totalGridMs = 0.0f;
-        float totalDensityMs = 0.0f;
-        float totalConstraintMs = 0.0f;
-        float totalFinalizeMs = 0.0f;
-        float totalNeighbors = 0.0f;
-        float totalDensityError = 0.0f;
-        float maxSpeed = 0.0f;
+        for (const BenchmarkCase& benchmarkCase : cases) {
+            WaterSimulationSettings settings;
+            settings.particlesX = benchmarkCase.x;
+            settings.particlesY = benchmarkCase.y;
+            settings.particlesZ = benchmarkCase.z;
+            settings.qualityPolicy = SimulationQualityPolicy::FavorResponsiveness;
+            settings.backend = backend;
+            WaterSimulation simulation(settings);
 
-        constexpr int kMeasuredFrames = 90;
-        for (int i = 0; i < kMeasuredFrames; ++i) {
-            simulation.step(kFixedSimulationStep);
-            const SimulationStats& stats = simulation.stats();
-            totalStepMs += stats.totalStepMs;
-            totalGridMs += stats.gridBuildMs;
-            totalDensityMs += stats.densityPassMs;
-            totalConstraintMs += stats.constraintPassMs;
-            totalFinalizeMs += stats.finalizeMs;
-            totalNeighbors += static_cast<float>(stats.neighborSamples);
-            totalDensityError += stats.averageDensityError;
-            maxSpeed = std::max(maxSpeed, stats.maxSpeed);
+            for (int frame = 0; frame < scene.warmupFrames; ++frame) {
+                simulation.step(kFixedSimulationStep);
+            }
+
+            float totalStepMs = 0.0f;
+            float totalGridMs = 0.0f;
+            float totalDensityMs = 0.0f;
+            float totalConstraintMs = 0.0f;
+            float totalDivergenceMs = 0.0f;
+            float totalFinalizeMs = 0.0f;
+            float totalNeighbors = 0.0f;
+            float totalDensityError = 0.0f;
+            float totalDivergenceError = 0.0f;
+            float maxSpeed = 0.0f;
+
+            for (int frame = 0; frame < scene.measuredFrames; ++frame) {
+                scene.applyStep(simulation, settings, frame);
+                simulation.step(kFixedSimulationStep);
+                const SimulationStats& stats = simulation.stats();
+                totalStepMs += stats.totalStepMs;
+                totalGridMs += stats.gridBuildMs;
+                totalDensityMs += stats.densityPassMs;
+                totalConstraintMs += stats.constraintPassMs;
+                totalDivergenceMs += stats.divergencePassMs;
+                totalFinalizeMs += stats.finalizeMs;
+                totalNeighbors += static_cast<float>(stats.neighborSamples);
+                totalDensityError += stats.averageDensityError;
+                totalDivergenceError += stats.averageDivergenceError;
+                maxSpeed = std::max(maxSpeed, stats.maxSpeed);
+            }
+
+            const float frames = static_cast<float>(scene.measuredFrames);
+            std::cout
+                << scene.name << ','
+                << benchmarkCase.label << ','
+                << simulation.particleCount() << ','
+                << (totalStepMs / frames) << ','
+                << (totalGridMs / frames) << ','
+                << (totalDensityMs / frames) << ','
+                << (totalConstraintMs / frames) << ','
+                << (totalDivergenceMs / frames) << ','
+                << (totalFinalizeMs / frames) << ','
+                << (totalNeighbors / frames) << ','
+                << (totalDensityError / frames) << ','
+                << maxSpeed << ','
+                << (totalDivergenceError / frames) << '\n'
+                << std::flush;
         }
-
-        const float frames = static_cast<float>(kMeasuredFrames);
-        std::cout
-            << benchmarkCase.label << ','
-            << simulation.particleCount() << ','
-            << (totalStepMs / frames) << ','
-            << (totalGridMs / frames) << ','
-            << (totalDensityMs / frames) << ','
-            << (totalConstraintMs / frames) << ','
-            << (totalFinalizeMs / frames) << ','
-            << (totalNeighbors / frames) << ','
-            << (totalDensityError / frames) << ','
-            << maxSpeed << '\n'
-            << std::flush;
     }
+
+    if (!matchedScene) {
+        std::cerr
+            << "Unknown benchmark scene filter: " << sceneFilter
+            << " (expected all, steady-state, calm-rest, repeated-impulse, or wall-slash)"
+            << std::endl;
+        return 1;
+    }
+
+    return 0;
 }
 } // namespace
 
 int main(int argc, char** argv) {
     const bool useMetalBackend = shouldUseMetalBackend(argc, argv);
     if (shouldRunBenchmark(argc, argv)) {
-        runBenchmarks(useMetalBackend ? SimulationBackend::Metal : SimulationBackend::CPU);
-        return 0;
+        return runBenchmarks(useMetalBackend ? SimulationBackend::Metal : SimulationBackend::CPU, benchmarkSceneFilter(argc, argv));
     }
 
     glfwSetErrorCallback(glfwErrorCallback);
@@ -582,12 +719,16 @@ int main(int argc, char** argv) {
     }
     bool showAdvancedWaterControls = false;
     SimulationWorker simulationWorker(uiSettings);
-    WaterRenderSnapshot renderSnapshot;
+    WaterRenderSnapshot targetSnapshot;
+    WaterRenderSnapshot sourceSnapshot;
+    WaterRenderSnapshot displaySnapshot;
     SimulationStats simulationStats;
-    simulationWorker.consumeLatest(renderSnapshot, simulationStats);
+    simulationWorker.consumeLatest(targetSnapshot, simulationStats);
+    sourceSnapshot = targetSnapshot;
+    displaySnapshot = targetSnapshot;
 
     WaterRenderer renderer;
-    if (!renderer.initialize(std::string(RESOURCES_PATH), renderSnapshot)) {
+    if (!renderer.initialize(std::string(RESOURCES_PATH), displaySnapshot)) {
         std::cerr << "Failed to initialize renderer resources" << std::endl;
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
@@ -599,8 +740,8 @@ int main(int argc, char** argv) {
 
     WaterPalette palette;
     WaterRenderSettings renderSettings;
-    renderSettings.basinFloorY = renderSnapshot.containerFloorY;
-    renderSettings.basinLipY = renderSnapshot.containerLipY;
+    renderSettings.basinFloorY = displaySnapshot.containerFloorY;
+    renderSettings.basinLipY = displaySnapshot.containerLipY;
     int debugMode = 0;
 
     glEnable(GL_DEPTH_TEST);
@@ -608,8 +749,20 @@ int main(int argc, char** argv) {
 
     double previousTime = glfwGetTime();
     double startupRippleTimer = 0.0;
+    double snapshotBlendStartTime = previousTime;
+    double snapshotBlendDuration = 0.0;
     bool startupRipplePending = true;
+    bool snapshotBlendActive = false;
     WaterStrokeState strokeState;
+    float renderUploadMs = 0.0f;
+
+    auto uploadSnapshotToRenderer = [&](const WaterRenderSnapshot& snapshot) {
+        const auto uploadStart = Clock::now();
+        renderer.updateSurface(snapshot);
+        renderUploadMs = std::chrono::duration<float, std::milli>(Clock::now() - uploadStart).count();
+        renderSettings.basinFloorY = snapshot.containerFloorY;
+        renderSettings.basinLipY = snapshot.containerLipY;
+    };
 
     while (!glfwWindowShouldClose(window)) {
         const double currentTime = glfwGetTime();
@@ -637,7 +790,7 @@ int main(int argc, char** argv) {
         camera.update(window, frameTime, io.WantCaptureMouse);
 
         if (startupRipplePending && startupRippleTimer >= kStartupRippleDelay) {
-            seedStartupRipple(simulationWorker, renderSnapshot, uiSettings);
+            seedStartupRipple(simulationWorker, displaySnapshot, uiSettings);
             startupRipplePending = false;
         }
 
@@ -651,8 +804,8 @@ int main(int argc, char** argv) {
                 camera,
                 cursorX,
                 cursorY,
-                renderSnapshot.interactionPlaneY,
-                renderSnapshot.halfDomainSize,
+                displaySnapshot.interactionPlaneY,
+                displaySnapshot.halfDomainSize,
                 hoverPoint
             );
         }
@@ -675,7 +828,7 @@ int main(int argc, char** argv) {
         if (!io.WantCaptureMouse && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && hoverValid) {
             applyStrokeSegment(
                 simulationWorker,
-                renderSnapshot,
+                displaySnapshot,
                 uiSettings,
                 strokeState,
                 glm::vec2(hoverPoint.x, hoverPoint.z),
@@ -687,10 +840,36 @@ int main(int argc, char** argv) {
             strokeState.filteredVelocity = glm::vec2(0.0f);
         }
 
-        if (simulationWorker.consumeLatest(renderSnapshot, simulationStats)) {
-            renderer.updateSurface(renderSnapshot);
-            renderSettings.basinFloorY = renderSnapshot.containerFloorY;
-            renderSettings.basinLipY = renderSnapshot.containerLipY;
+        if (simulationWorker.consumeLatest(targetSnapshot, simulationStats)) {
+            const std::uint64_t versionDelta =
+                targetSnapshot.version > displaySnapshot.version ? targetSnapshot.version - displaySnapshot.version : 1;
+            if (versionDelta > 1 && canInterpolateSnapshots(displaySnapshot, targetSnapshot)) {
+                sourceSnapshot = displaySnapshot;
+                snapshotBlendDuration = static_cast<double>(versionDelta) * static_cast<double>(kFixedSimulationStep);
+                snapshotBlendStartTime =
+                    currentTime - std::min<double>(static_cast<double>(frameTime), snapshotBlendDuration);
+                snapshotBlendActive = true;
+            } else {
+                snapshotBlendActive = false;
+                displaySnapshot = targetSnapshot;
+                uploadSnapshotToRenderer(displaySnapshot);
+            }
+        }
+
+        if (snapshotBlendActive) {
+            const double elapsedBlendTime = currentTime - snapshotBlendStartTime;
+            const float alpha = static_cast<float>(
+                std::clamp(
+                    snapshotBlendDuration > 0.0 ? elapsedBlendTime / snapshotBlendDuration : 1.0,
+                    0.0,
+                    1.0
+                )
+            );
+            interpolateRenderSnapshot(sourceSnapshot, targetSnapshot, alpha, displaySnapshot);
+            uploadSnapshotToRenderer(displaySnapshot);
+            if (alpha >= 1.0f - 1.0e-4f) {
+                snapshotBlendActive = false;
+            }
         }
 
         bool settingsChanged = false;
@@ -702,14 +881,26 @@ int main(int argc, char** argv) {
         ImGui::Text("Sim step %.2f ms", simulationStats.totalStepMs);
         ImGui::Text("Grid %.2f ms  Density %.2f ms", simulationStats.gridBuildMs, simulationStats.densityPassMs);
         ImGui::Text(
-            "Constraint %.2f ms  Finalize %.2f ms",
+            "Constraint %.2f ms  Divergence %.2f ms  Finalize %.2f ms",
             simulationStats.constraintPassMs,
+            simulationStats.divergencePassMs,
             simulationStats.finalizeMs
         );
         ImGui::Text(
-            "Snapshot %.2f ms  Density err %.3f",
+            "Snapshot %.2f ms  Upload %.2f ms",
             simulationStats.snapshotMs,
-            simulationStats.averageDensityError
+            renderUploadMs
+        );
+        ImGui::Text(
+            "Density err %.3f  Divergence err %.3f  Real-time %.2fx",
+            simulationStats.averageDensityError,
+            simulationStats.averageDivergenceError,
+            simulationStats.realTimeRatio
+        );
+        ImGui::Text(
+            "Publish every %d step%s",
+            simulationStats.snapshotInterval,
+            simulationStats.snapshotInterval == 1 ? "" : "s"
         );
         ImGui::Separator();
         ImGui::TextUnformatted("Camera");

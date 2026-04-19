@@ -19,12 +19,40 @@ namespace {
 using Clock = std::chrono::steady_clock;
 
 constexpr float kEpsilon = 1.0e-6f;
+constexpr float kPi = 3.14159265358979323846f;
 constexpr float kSpawnSpacingScale = 1.95f;
 constexpr float kMinDeltaTime = 1.0e-4f;
 constexpr float kMaxDeltaTime = 1.0f / 24.0f;
+constexpr NSUInteger kScanBlockSize = 256;
 
 float toMilliseconds(const Clock::duration& duration) {
     return std::chrono::duration<float, std::milli>(duration).count();
+}
+
+float computePoly6Coefficient(float smoothingLength) {
+    const float h2 = smoothingLength * smoothingLength;
+    const float h4 = h2 * h2;
+    const float h6 = h4 * h2;
+    const float h9 = h6 * h2 * smoothingLength;
+    return 315.0f / (64.0f * kPi * h9);
+}
+
+float computeSpikyGradientCoefficient(float smoothingLength) {
+    const float h2 = smoothingLength * smoothingLength;
+    const float h4 = h2 * h2;
+    const float h6 = h4 * h2;
+    return -45.0f / (kPi * h6);
+}
+
+float computeOpenTopGridMaxY(const WaterSimulationSettings& settings) {
+    const float spacing = settings.particleRadius * kSpawnSpacingScale;
+    const float estimatedSpawnTop =
+        settings.containerFloorY +
+        settings.particleRadius * 1.6f +
+        static_cast<float>(std::max(settings.particlesY - 1, 0)) * spacing +
+        settings.particleRadius;
+    const float splashHeadroom = std::max(settings.smoothingLength * 4.0f, settings.particleRadius * 8.0f);
+    return std::max(settings.containerLipY + splashHeadroom, estimatedSpawnTop + splashHeadroom * 0.5f);
 }
 
 float structuralDifference(const WaterSimulationSettings& lhs, const WaterSimulationSettings& rhs) {
@@ -49,6 +77,8 @@ struct MetalSimParams {
     float restDensity = 0.0f;
     float pressureStiffness = 0.0f;
     float nearPressureStiffness = 0.0f;
+    float viscosityLinear = 0.0f;
+    float viscosityQuadratic = 0.0f;
     float xsphViscosity = 0.0f;
     float velocityDamping = 0.0f;
     float restVelocityDamping = 0.0f;
@@ -58,6 +88,9 @@ struct MetalSimParams {
     float boundaryDamping = 0.0f;
     float boundaryRestitution = 0.0f;
     float boundaryFriction = 0.0f;
+    float poly6Coefficient = 0.0f;
+    float spikyGradientCoefficient = 0.0f;
+    float correctionReferenceKernel = 0.0f;
     float gravity = 0.0f;
     float maxSpeed = 0.0f;
     float maxSpeedSquared = 0.0f;
@@ -66,6 +99,11 @@ struct MetalSimParams {
     float containerLipY = 0.0f;
     float particleRadius = 0.0f;
     float interactionPlaneY = 0.0f;
+    float foamDecay = 0.0f;
+};
+
+struct ScanParams {
+    std::uint32_t count = 0;
 };
 
 void sanitizeSettings(WaterSimulationSettings& settings) {
@@ -79,7 +117,11 @@ void sanitizeSettings(WaterSimulationSettings& settings) {
     settings.restDensity = std::max(settings.restDensity, 0.5f);
     settings.pressureStiffness = std::max(settings.pressureStiffness, 0.001f);
     settings.nearPressureStiffness = std::max(settings.nearPressureStiffness, 0.0f);
+    settings.viscosityLinear = std::max(settings.viscosityLinear, 0.0f);
+    settings.viscosityQuadratic = std::max(settings.viscosityQuadratic, 0.0f);
     settings.xsphViscosity = glm::clamp(settings.xsphViscosity, 0.0f, 1.0f);
+    settings.velocityDamping = std::max(settings.velocityDamping, 0.0f);
+    settings.restVelocityDamping = std::max(settings.restVelocityDamping, 0.0f);
     settings.velocityTransfer = glm::clamp(settings.velocityTransfer, 0.0f, 1.0f);
     settings.positionRelaxation = glm::clamp(settings.positionRelaxation, 0.05f, 1.0f);
     settings.tensileCorrection = glm::clamp(settings.tensileCorrection, 0.0f, 0.01f);
@@ -103,19 +145,32 @@ struct MetalSimulationBackend::Impl {
     id<MTLLibrary> library = nil;
     id<MTLComputePipelineState> integratePipeline = nil;
     id<MTLComputePipelineState> assignCellsPipeline = nil;
+    id<MTLComputePipelineState> scanExclusivePipeline = nil;
+    id<MTLComputePipelineState> addScanOffsetsPipeline = nil;
+    id<MTLComputePipelineState> writeTerminalCellStartPipeline = nil;
     id<MTLComputePipelineState> scatterSortedPipeline = nil;
-    id<MTLComputePipelineState> densityLambdaPipeline = nil;
-    id<MTLComputePipelineState> correctionPipeline = nil;
+    id<MTLComputePipelineState> densityAlphaPipeline = nil;
+    id<MTLComputePipelineState> densityPressurePipeline = nil;
+    id<MTLComputePipelineState> densityCorrectionPipeline = nil;
     id<MTLComputePipelineState> applyCorrectionPipeline = nil;
+    id<MTLComputePipelineState> provisionalVelocityPipeline = nil;
+    id<MTLComputePipelineState> divergenceAlphaPipeline = nil;
+    id<MTLComputePipelineState> divergencePressurePipeline = nil;
+    id<MTLComputePipelineState> divergenceSolvePipeline = nil;
     id<MTLComputePipelineState> finalizePipeline = nil;
 
     id<MTLBuffer> paramsBuffer = nil;
     id<MTLBuffer> positionsBuffer = nil;
     id<MTLBuffer> predictedBuffer = nil;
     id<MTLBuffer> velocitiesBuffer = nil;
+    id<MTLBuffer> provisionalVelocitiesBuffer = nil;
     id<MTLBuffer> correctionsBuffer = nil;
     id<MTLBuffer> densitiesBuffer = nil;
-    id<MTLBuffer> lambdasBuffer = nil;
+    id<MTLBuffer> alphasBuffer = nil;
+    id<MTLBuffer> densityPressureBuffer = nil;
+    id<MTLBuffer> divergencePressureBuffer = nil;
+    id<MTLBuffer> densityErrorBuffer = nil;
+    id<MTLBuffer> divergenceErrorBuffer = nil;
     id<MTLBuffer> metricsBuffer = nil;
     id<MTLBuffer> interactionHeatBuffer = nil;
     id<MTLBuffer> foamBuffer = nil;
@@ -125,6 +180,9 @@ struct MetalSimulationBackend::Impl {
     id<MTLBuffer> cellWriteHeadsBuffer = nil;
     id<MTLBuffer> sortedParticleIndicesBuffer = nil;
     id<MTLBuffer> neighborCounterBuffer = nil;
+    id<MTLBuffer> scanBlockSums0Buffer = nil;
+    id<MTLBuffer> scanBlockSums1Buffer = nil;
+    id<MTLBuffer> scanBlockSums2Buffer = nil;
 
     WaterSimulationSettings settings;
     SimulationStats stats;
@@ -170,20 +228,36 @@ struct MetalSimulationBackend::Impl {
 
             integratePipeline = createPipeline(@"integratePredictedKernel");
             assignCellsPipeline = createPipeline(@"assignCellsKernel");
+            scanExclusivePipeline = createPipeline(@"scanExclusiveBlocksKernel");
+            addScanOffsetsPipeline = createPipeline(@"addScanOffsetsKernel");
+            writeTerminalCellStartPipeline = createPipeline(@"writeTerminalCellStartKernel");
             scatterSortedPipeline = createPipeline(@"scatterSortedKernel");
-            densityLambdaPipeline = createPipeline(@"computeDensityLambdaKernel");
-            correctionPipeline = createPipeline(@"computePositionCorrectionsKernel");
+            densityAlphaPipeline = createPipeline(@"computeDensityAlphaKernel");
+            densityPressurePipeline = createPipeline(@"updateDensityPressureKernel");
+            densityCorrectionPipeline = createPipeline(@"computeDensityCorrectionsKernel");
             applyCorrectionPipeline = createPipeline(@"applyCorrectionsKernel");
+            provisionalVelocityPipeline = createPipeline(@"updateProvisionalVelocitiesKernel");
+            divergenceAlphaPipeline = createPipeline(@"computeDivergenceAlphaKernel");
+            divergencePressurePipeline = createPipeline(@"updateDivergencePressureKernel");
+            divergenceSolvePipeline = createPipeline(@"solveDivergenceKernel");
             finalizePipeline = createPipeline(@"finalizeKernel");
         }
 
         available =
             integratePipeline != nil &&
             assignCellsPipeline != nil &&
+            scanExclusivePipeline != nil &&
+            addScanOffsetsPipeline != nil &&
+            writeTerminalCellStartPipeline != nil &&
             scatterSortedPipeline != nil &&
-            densityLambdaPipeline != nil &&
-            correctionPipeline != nil &&
+            densityAlphaPipeline != nil &&
+            densityPressurePipeline != nil &&
+            densityCorrectionPipeline != nil &&
             applyCorrectionPipeline != nil &&
+            provisionalVelocityPipeline != nil &&
+            divergenceAlphaPipeline != nil &&
+            divergencePressurePipeline != nil &&
+            divergenceSolvePipeline != nil &&
             finalizePipeline != nil;
     }
 
@@ -204,10 +278,11 @@ struct MetalSimulationBackend::Impl {
 
     void updateDerivedConfig() {
         halfDomain = settings.domainSize * 0.5f;
+        const float gridMaxY = computeOpenTopGridMaxY(settings);
         gridResolutionX = std::max(1, static_cast<int>(std::ceil((settings.domainSize) / settings.smoothingLength)) + 1);
         gridResolutionY = std::max(
             1,
-            static_cast<int>(std::ceil((settings.containerLipY - settings.containerFloorY) / settings.smoothingLength)) + 1
+            static_cast<int>(std::ceil((gridMaxY - settings.containerFloorY) / settings.smoothingLength)) + 1
         );
         gridResolutionZ = gridResolutionX;
         particleCount =
@@ -233,9 +308,14 @@ struct MetalSimulationBackend::Impl {
         allocateBuffer(&positionsBuffer, particleCount * sizeof(simd_float4));
         allocateBuffer(&predictedBuffer, particleCount * sizeof(simd_float4));
         allocateBuffer(&velocitiesBuffer, particleCount * sizeof(simd_float4));
+        allocateBuffer(&provisionalVelocitiesBuffer, particleCount * sizeof(simd_float4));
         allocateBuffer(&correctionsBuffer, particleCount * sizeof(simd_float4));
         allocateBuffer(&densitiesBuffer, particleCount * sizeof(float));
-        allocateBuffer(&lambdasBuffer, particleCount * sizeof(float));
+        allocateBuffer(&alphasBuffer, particleCount * sizeof(float));
+        allocateBuffer(&densityPressureBuffer, particleCount * sizeof(float));
+        allocateBuffer(&divergencePressureBuffer, particleCount * sizeof(float));
+        allocateBuffer(&densityErrorBuffer, particleCount * sizeof(float));
+        allocateBuffer(&divergenceErrorBuffer, particleCount * sizeof(float));
         allocateBuffer(&metricsBuffer, particleCount * sizeof(simd_float4));
         allocateBuffer(&interactionHeatBuffer, particleCount * sizeof(float));
         allocateBuffer(&foamBuffer, particleCount * sizeof(float));
@@ -245,6 +325,13 @@ struct MetalSimulationBackend::Impl {
         allocateBuffer(&cellWriteHeadsBuffer, cellCount * sizeof(std::uint32_t));
         allocateBuffer(&sortedParticleIndicesBuffer, particleCount * sizeof(std::uint32_t));
         allocateBuffer(&neighborCounterBuffer, sizeof(std::uint32_t));
+
+        const std::size_t level0Blocks = std::max<std::size_t>(1, (cellCount + kScanBlockSize - 1) / kScanBlockSize);
+        const std::size_t level1Blocks = std::max<std::size_t>(1, (level0Blocks + kScanBlockSize - 1) / kScanBlockSize);
+        const std::size_t level2Blocks = std::max<std::size_t>(1, (level1Blocks + kScanBlockSize - 1) / kScanBlockSize);
+        allocateBuffer(&scanBlockSums0Buffer, level0Blocks * sizeof(std::uint32_t));
+        allocateBuffer(&scanBlockSums1Buffer, level1Blocks * sizeof(std::uint32_t));
+        allocateBuffer(&scanBlockSums2Buffer, level2Blocks * sizeof(std::uint32_t));
     }
 
     void refreshParams(float deltaTime) {
@@ -259,6 +346,8 @@ struct MetalSimulationBackend::Impl {
         params.restDensity = settings.restDensity;
         params.pressureStiffness = settings.pressureStiffness;
         params.nearPressureStiffness = settings.nearPressureStiffness;
+        params.viscosityLinear = settings.viscosityLinear;
+        params.viscosityQuadratic = settings.viscosityQuadratic;
         params.xsphViscosity = settings.xsphViscosity;
         params.velocityDamping = settings.velocityDamping;
         params.restVelocityDamping = settings.restVelocityDamping;
@@ -268,6 +357,13 @@ struct MetalSimulationBackend::Impl {
         params.boundaryDamping = settings.boundaryDamping;
         params.boundaryRestitution = settings.boundaryRestitution;
         params.boundaryFriction = settings.boundaryFriction;
+        params.poly6Coefficient = computePoly6Coefficient(settings.smoothingLength);
+        params.spikyGradientCoefficient = computeSpikyGradientCoefficient(settings.smoothingLength);
+        params.correctionReferenceKernel = std::max(
+            params.poly6Coefficient *
+                std::pow(params.smoothingLengthSquared - params.smoothingLengthSquared * 0.12f, 3.0f),
+            kEpsilon
+        );
         params.gravity = settings.gravity;
         params.maxSpeed = settings.maxSpeed;
         params.maxSpeedSquared = settings.maxSpeed * settings.maxSpeed;
@@ -276,6 +372,7 @@ struct MetalSimulationBackend::Impl {
         params.containerLipY = settings.containerLipY;
         params.particleRadius = settings.particleRadius;
         params.interactionPlaneY = interactionPlaneY;
+        params.foamDecay = settings.foamDecay;
         std::memcpy([paramsBuffer contents], &params, sizeof(params));
     }
 
@@ -284,6 +381,17 @@ struct MetalSimulationBackend::Impl {
         const NSUInteger threadWidth = std::max<NSUInteger>(1, [pipeline threadExecutionWidth]);
         const NSUInteger threadsPerGroup =
             std::min<NSUInteger>(std::max<NSUInteger>(threadWidth, 64), [pipeline maxTotalThreadsPerThreadgroup]);
+        [encoder dispatchThreads:MTLSizeMake(count, 1, 1)
+          threadsPerThreadgroup:MTLSizeMake(threadsPerGroup, 1, 1)];
+    }
+
+    void dispatchFixed1D(
+        id<MTLComputeCommandEncoder> encoder,
+        id<MTLComputePipelineState> pipeline,
+        std::size_t count,
+        NSUInteger threadsPerGroup
+    ) {
+        [encoder setComputePipelineState:pipeline];
         [encoder dispatchThreads:MTLSizeMake(count, 1, 1)
           threadsPerThreadgroup:MTLSizeMake(threadsPerGroup, 1, 1)];
     }
@@ -297,12 +405,94 @@ struct MetalSimulationBackend::Impl {
         }
     }
 
+    void encodeScanBlocks(
+        id<MTLCommandBuffer> commandBuffer,
+        id<MTLBuffer> inputBuffer,
+        id<MTLBuffer> outputBuffer,
+        id<MTLBuffer> blockSumsBuffer,
+        std::size_t count
+    ) {
+        if (count == 0) {
+            return;
+        }
+
+        ScanParams scanParams;
+        scanParams.count = static_cast<std::uint32_t>(count);
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+        [encoder setBytes:&scanParams length:sizeof(scanParams) atIndex:0];
+        [encoder setBuffer:inputBuffer offset:0 atIndex:1];
+        [encoder setBuffer:outputBuffer offset:0 atIndex:2];
+        [encoder setBuffer:blockSumsBuffer offset:0 atIndex:3];
+        dispatchFixed1D(encoder, scanExclusivePipeline, ((count + kScanBlockSize - 1) / kScanBlockSize) * kScanBlockSize, kScanBlockSize);
+        [encoder endEncoding];
+    }
+
+    void encodeAddScanOffsets(
+        id<MTLCommandBuffer> commandBuffer,
+        id<MTLBuffer> valuesBuffer,
+        id<MTLBuffer> blockOffsetsBuffer,
+        std::size_t count
+    ) {
+        if (count == 0) {
+            return;
+        }
+
+        ScanParams scanParams;
+        scanParams.count = static_cast<std::uint32_t>(count);
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+        [encoder setBytes:&scanParams length:sizeof(scanParams) atIndex:0];
+        [encoder setBuffer:valuesBuffer offset:0 atIndex:1];
+        [encoder setBuffer:blockOffsetsBuffer offset:0 atIndex:2];
+        dispatch1D(encoder, addScanOffsetsPipeline, count);
+        [encoder endEncoding];
+    }
+
+    void encodeWriteTerminalCellStart(id<MTLCommandBuffer> commandBuffer, std::size_t count) {
+        if (count == 0) {
+            return;
+        }
+
+        ScanParams scanParams;
+        scanParams.count = static_cast<std::uint32_t>(count);
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+        [encoder setBytes:&scanParams length:sizeof(scanParams) atIndex:0];
+        [encoder setBuffer:cellStartsBuffer offset:0 atIndex:1];
+        [encoder setBuffer:cellCountsBuffer offset:0 atIndex:2];
+        dispatchFixed1D(encoder, writeTerminalCellStartPipeline, 1, 1);
+        [encoder endEncoding];
+    }
+
+    void encodeExclusiveScan(id<MTLCommandBuffer> commandBuffer, id<MTLBuffer> inputBuffer, id<MTLBuffer> outputBuffer, std::size_t count) {
+        if (count == 0) {
+            return;
+        }
+
+        const std::size_t level0Blocks = (count + kScanBlockSize - 1) / kScanBlockSize;
+        encodeScanBlocks(commandBuffer, inputBuffer, outputBuffer, scanBlockSums0Buffer, count);
+        if (level0Blocks > 1) {
+            const std::size_t level1Blocks = (level0Blocks + kScanBlockSize - 1) / kScanBlockSize;
+            encodeScanBlocks(commandBuffer, scanBlockSums0Buffer, scanBlockSums0Buffer, scanBlockSums1Buffer, level0Blocks);
+            if (level1Blocks > 1) {
+                const std::size_t level2Blocks = (level1Blocks + kScanBlockSize - 1) / kScanBlockSize;
+                encodeScanBlocks(commandBuffer, scanBlockSums1Buffer, scanBlockSums1Buffer, scanBlockSums2Buffer, level1Blocks);
+                if (level2Blocks > 1) {
+                    std::cerr << "Metal grid scan exceeded expected depth; results may be incomplete." << std::endl;
+                }
+                encodeAddScanOffsets(commandBuffer, scanBlockSums0Buffer, scanBlockSums1Buffer, level0Blocks);
+            }
+            encodeAddScanOffsets(commandBuffer, outputBuffer, scanBlockSums0Buffer, count);
+        }
+        encodeWriteTerminalCellStart(commandBuffer, count);
+    }
+
     void rebuildGrid(float deltaTime) {
         refreshParams(deltaTime);
 
-        std::memset([cellCountsBuffer contents], 0, cellCount * sizeof(std::uint32_t));
-
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLBlitCommandEncoder> blitEncoder = [commandBuffer blitCommandEncoder];
+        [blitEncoder fillBuffer:cellCountsBuffer range:NSMakeRange(0, cellCount * sizeof(std::uint32_t)) value:0];
+        [blitEncoder endEncoding];
+
         id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
         [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
         [encoder setBuffer:predictedBuffer offset:0 atIndex:1];
@@ -310,21 +500,17 @@ struct MetalSimulationBackend::Impl {
         [encoder setBuffer:cellCountsBuffer offset:0 atIndex:3];
         dispatch1D(encoder, assignCellsPipeline, particleCount);
         [encoder endEncoding];
-        waitForCommandBuffer(commandBuffer);
 
-        auto* counts = static_cast<std::uint32_t*>([cellCountsBuffer contents]);
-        auto* starts = static_cast<std::uint32_t*>([cellStartsBuffer contents]);
-        starts[0] = 0;
-        stats.activeCells = 0;
-        for (std::size_t i = 0; i < cellCount; ++i) {
-            if (counts[i] > 0) {
-                ++stats.activeCells;
-            }
-            starts[i + 1] = starts[i] + counts[i];
-        }
-        std::memcpy([cellWriteHeadsBuffer contents], starts, cellCount * sizeof(std::uint32_t));
+        encodeExclusiveScan(commandBuffer, cellCountsBuffer, cellStartsBuffer, cellCount);
 
-        commandBuffer = [commandQueue commandBuffer];
+        blitEncoder = [commandBuffer blitCommandEncoder];
+        [blitEncoder copyFromBuffer:cellStartsBuffer
+                       sourceOffset:0
+                           toBuffer:cellWriteHeadsBuffer
+                  destinationOffset:0
+                               size:cellCount * sizeof(std::uint32_t)];
+        [blitEncoder endEncoding];
+
         encoder = [commandBuffer computeCommandEncoder];
         [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
         [encoder setBuffer:particleCellsBuffer offset:0 atIndex:1];
@@ -333,6 +519,14 @@ struct MetalSimulationBackend::Impl {
         dispatch1D(encoder, scatterSortedPipeline, particleCount);
         [encoder endEncoding];
         waitForCommandBuffer(commandBuffer);
+
+        const auto* counts = static_cast<const std::uint32_t*>([cellCountsBuffer contents]);
+        stats.activeCells = 0;
+        for (std::size_t i = 0; i < cellCount; ++i) {
+            if (counts[i] > 0) {
+                ++stats.activeCells;
+            }
+        }
     }
 
     void runIntegrate(float deltaTime) {
@@ -358,7 +552,7 @@ struct MetalSimulationBackend::Impl {
         return *static_cast<const std::uint32_t*>([neighborCounterBuffer contents]);
     }
 
-    void runDensityLambda(float deltaTime) {
+    void runDensityAlpha(float deltaTime) {
         refreshParams(deltaTime);
         resetNeighborCounter();
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
@@ -368,30 +562,90 @@ struct MetalSimulationBackend::Impl {
         [encoder setBuffer:cellStartsBuffer offset:0 atIndex:2];
         [encoder setBuffer:sortedParticleIndicesBuffer offset:0 atIndex:3];
         [encoder setBuffer:densitiesBuffer offset:0 atIndex:4];
-        [encoder setBuffer:lambdasBuffer offset:0 atIndex:5];
-        [encoder setBuffer:neighborCounterBuffer offset:0 atIndex:6];
-        dispatch1D(encoder, densityLambdaPipeline, particleCount);
+        [encoder setBuffer:alphasBuffer offset:0 atIndex:5];
+        [encoder setBuffer:densityErrorBuffer offset:0 atIndex:6];
+        [encoder setBuffer:neighborCounterBuffer offset:0 atIndex:7];
+        dispatch1D(encoder, densityAlphaPipeline, particleCount);
         [encoder endEncoding];
         waitForCommandBuffer(commandBuffer);
         stats.neighborSamples += fetchNeighborCounter();
     }
 
-    void runCorrections(float deltaTime) {
+    void runDensityCorrectionIteration(float deltaTime) {
         refreshParams(deltaTime);
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+        [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
+        [encoder setBuffer:alphasBuffer offset:0 atIndex:1];
+        [encoder setBuffer:densityErrorBuffer offset:0 atIndex:2];
+        [encoder setBuffer:densityPressureBuffer offset:0 atIndex:3];
+        dispatch1D(encoder, densityPressurePipeline, particleCount);
+
+        [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
+        [encoder setBuffer:predictedBuffer offset:0 atIndex:1];
+        [encoder setBuffer:cellStartsBuffer offset:0 atIndex:2];
+        [encoder setBuffer:sortedParticleIndicesBuffer offset:0 atIndex:3];
+        [encoder setBuffer:densityPressureBuffer offset:0 atIndex:4];
+        [encoder setBuffer:correctionsBuffer offset:0 atIndex:5];
+        dispatch1D(encoder, densityCorrectionPipeline, particleCount);
+
+        [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
+        [encoder setBuffer:predictedBuffer offset:0 atIndex:1];
+        [encoder setBuffer:correctionsBuffer offset:0 atIndex:2];
+        dispatch1D(encoder, applyCorrectionPipeline, particleCount);
+        [encoder endEncoding];
+        waitForCommandBuffer(commandBuffer);
+    }
+
+    void updateProvisionalVelocities(float deltaTime) {
+        refreshParams(deltaTime);
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+        [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
+        [encoder setBuffer:positionsBuffer offset:0 atIndex:1];
+        [encoder setBuffer:predictedBuffer offset:0 atIndex:2];
+        [encoder setBuffer:provisionalVelocitiesBuffer offset:0 atIndex:3];
+        dispatch1D(encoder, provisionalVelocityPipeline, particleCount);
+        [encoder endEncoding];
+        waitForCommandBuffer(commandBuffer);
+    }
+
+    void runDivergenceAlpha(float deltaTime) {
+        refreshParams(deltaTime);
+        resetNeighborCounter();
         id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
         id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
         [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
         [encoder setBuffer:predictedBuffer offset:0 atIndex:1];
         [encoder setBuffer:cellStartsBuffer offset:0 atIndex:2];
         [encoder setBuffer:sortedParticleIndicesBuffer offset:0 atIndex:3];
-        [encoder setBuffer:lambdasBuffer offset:0 atIndex:4];
-        [encoder setBuffer:correctionsBuffer offset:0 atIndex:5];
-        dispatch1D(encoder, correctionPipeline, particleCount);
+        [encoder setBuffer:provisionalVelocitiesBuffer offset:0 atIndex:4];
+        [encoder setBuffer:alphasBuffer offset:0 atIndex:5];
+        [encoder setBuffer:divergenceErrorBuffer offset:0 atIndex:6];
+        [encoder setBuffer:neighborCounterBuffer offset:0 atIndex:7];
+        dispatch1D(encoder, divergenceAlphaPipeline, particleCount);
+        [encoder endEncoding];
+        waitForCommandBuffer(commandBuffer);
+        stats.neighborSamples += fetchNeighborCounter();
+    }
+
+    void runDivergenceCorrectionIteration(float deltaTime) {
+        refreshParams(deltaTime);
+        id<MTLCommandBuffer> commandBuffer = [commandQueue commandBuffer];
+        id<MTLComputeCommandEncoder> encoder = [commandBuffer computeCommandEncoder];
+        [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
+        [encoder setBuffer:alphasBuffer offset:0 atIndex:1];
+        [encoder setBuffer:divergenceErrorBuffer offset:0 atIndex:2];
+        [encoder setBuffer:divergencePressureBuffer offset:0 atIndex:3];
+        dispatch1D(encoder, divergencePressurePipeline, particleCount);
 
         [encoder setBuffer:paramsBuffer offset:0 atIndex:0];
         [encoder setBuffer:predictedBuffer offset:0 atIndex:1];
-        [encoder setBuffer:correctionsBuffer offset:0 atIndex:2];
-        dispatch1D(encoder, applyCorrectionPipeline, particleCount);
+        [encoder setBuffer:cellStartsBuffer offset:0 atIndex:2];
+        [encoder setBuffer:sortedParticleIndicesBuffer offset:0 atIndex:3];
+        [encoder setBuffer:divergencePressureBuffer offset:0 atIndex:4];
+        [encoder setBuffer:provisionalVelocitiesBuffer offset:0 atIndex:5];
+        dispatch1D(encoder, divergenceSolvePipeline, particleCount);
         [encoder endEncoding];
         waitForCommandBuffer(commandBuffer);
     }
@@ -405,13 +659,15 @@ struct MetalSimulationBackend::Impl {
         [encoder setBuffer:positionsBuffer offset:0 atIndex:1];
         [encoder setBuffer:predictedBuffer offset:0 atIndex:2];
         [encoder setBuffer:velocitiesBuffer offset:0 atIndex:3];
-        [encoder setBuffer:cellStartsBuffer offset:0 atIndex:4];
-        [encoder setBuffer:sortedParticleIndicesBuffer offset:0 atIndex:5];
-        [encoder setBuffer:densitiesBuffer offset:0 atIndex:6];
-        [encoder setBuffer:metricsBuffer offset:0 atIndex:7];
-        [encoder setBuffer:interactionHeatBuffer offset:0 atIndex:8];
-        [encoder setBuffer:foamBuffer offset:0 atIndex:9];
-        [encoder setBuffer:neighborCounterBuffer offset:0 atIndex:10];
+        [encoder setBuffer:provisionalVelocitiesBuffer offset:0 atIndex:4];
+        [encoder setBuffer:cellStartsBuffer offset:0 atIndex:5];
+        [encoder setBuffer:sortedParticleIndicesBuffer offset:0 atIndex:6];
+        [encoder setBuffer:densitiesBuffer offset:0 atIndex:7];
+        [encoder setBuffer:divergenceErrorBuffer offset:0 atIndex:8];
+        [encoder setBuffer:metricsBuffer offset:0 atIndex:9];
+        [encoder setBuffer:interactionHeatBuffer offset:0 atIndex:10];
+        [encoder setBuffer:foamBuffer offset:0 atIndex:11];
+        [encoder setBuffer:neighborCounterBuffer offset:0 atIndex:12];
         dispatch1D(encoder, finalizePipeline, particleCount);
         [encoder endEncoding];
         waitForCommandBuffer(commandBuffer);
@@ -442,19 +698,23 @@ struct MetalSimulationBackend::Impl {
     void reduceStats() {
         const auto* densities = static_cast<const float*>([densitiesBuffer contents]);
         const auto* velocities = static_cast<const simd_float4*>([velocitiesBuffer contents]);
+        const auto* divergenceErrors = static_cast<const float*>([divergenceErrorBuffer contents]);
 
         float densitySum = 0.0f;
         float densityErrorSum = 0.0f;
+        float divergenceErrorSum = 0.0f;
         float maxObservedSpeed = 0.0f;
         for (std::size_t i = 0; i < particleCount; ++i) {
             densitySum += densities[i];
             densityErrorSum += std::abs(densities[i] - settings.restDensity) / settings.restDensity;
+            divergenceErrorSum += std::abs(divergenceErrors[i]);
             maxObservedSpeed = std::max(maxObservedSpeed, simd_length(velocities[i].xyz));
         }
 
         const float count = static_cast<float>(std::max<std::size_t>(particleCount, 1));
         stats.averageDensity = densitySum / count;
         stats.averageDensityError = densityErrorSum / count;
+        stats.averageDivergenceError = divergenceErrorSum / count;
         stats.maxSpeed = maxObservedSpeed;
     }
 };
@@ -483,9 +743,14 @@ void MetalSimulationBackend::reset(const WaterSimulationSettings& settings) {
     auto* positions = static_cast<simd_float4*>([impl_->positionsBuffer contents]);
     auto* predicted = static_cast<simd_float4*>([impl_->predictedBuffer contents]);
     auto* velocities = static_cast<simd_float4*>([impl_->velocitiesBuffer contents]);
+    auto* provisionalVelocities = static_cast<simd_float4*>([impl_->provisionalVelocitiesBuffer contents]);
     auto* corrections = static_cast<simd_float4*>([impl_->correctionsBuffer contents]);
     auto* densities = static_cast<float*>([impl_->densitiesBuffer contents]);
-    auto* lambdas = static_cast<float*>([impl_->lambdasBuffer contents]);
+    auto* alphas = static_cast<float*>([impl_->alphasBuffer contents]);
+    auto* densityPressures = static_cast<float*>([impl_->densityPressureBuffer contents]);
+    auto* divergencePressures = static_cast<float*>([impl_->divergencePressureBuffer contents]);
+    auto* densityErrors = static_cast<float*>([impl_->densityErrorBuffer contents]);
+    auto* divergenceErrors = static_cast<float*>([impl_->divergenceErrorBuffer contents]);
     auto* metrics = static_cast<simd_float4*>([impl_->metricsBuffer contents]);
     auto* interactionHeat = static_cast<float*>([impl_->interactionHeatBuffer contents]);
     auto* foam = static_cast<float*>([impl_->foamBuffer contents]);
@@ -511,11 +776,7 @@ void MetalSimulationBackend::reset(const WaterSimulationSettings& settings) {
                     -impl_->halfDomain + impl_->settings.particleRadius,
                     impl_->halfDomain - impl_->settings.particleRadius
                 );
-                position.y = glm::clamp(
-                    position.y,
-                    impl_->settings.containerFloorY + impl_->settings.particleRadius,
-                    impl_->settings.containerLipY - impl_->settings.particleRadius
-                );
+                position.y = std::max(position.y, impl_->settings.containerFloorY + impl_->settings.particleRadius);
                 position.z = glm::clamp(
                     position.z,
                     -impl_->halfDomain + impl_->settings.particleRadius,
@@ -525,9 +786,14 @@ void MetalSimulationBackend::reset(const WaterSimulationSettings& settings) {
                 positions[index] = simd_make_float4(position.x, position.y, position.z, 1.0f);
                 predicted[index] = positions[index];
                 velocities[index] = simd_make_float4(0.0f, 0.0f, 0.0f, 0.0f);
+                provisionalVelocities[index] = simd_make_float4(0.0f, 0.0f, 0.0f, 0.0f);
                 corrections[index] = simd_make_float4(0.0f, 0.0f, 0.0f, 0.0f);
                 densities[index] = impl_->settings.restDensity;
-                lambdas[index] = 0.0f;
+                alphas[index] = 0.0f;
+                densityPressures[index] = 0.0f;
+                divergencePressures[index] = 0.0f;
+                densityErrors[index] = 0.0f;
+                divergenceErrors[index] = 0.0f;
                 metrics[index] = simd_make_float4(1.0f, 0.0f, 0.0f, 0.0f);
                 interactionHeat[index] = 0.0f;
                 foam[index] = 0.0f;
@@ -536,6 +802,15 @@ void MetalSimulationBackend::reset(const WaterSimulationSettings& settings) {
         }
     }
 
+    impl_->stats = {};
+    impl_->stats.particleCount = impl_->particleCount;
+    impl_->updateDerivedStateFromPositions();
+    impl_->rebuildGrid(1.0f / 120.0f);
+    constexpr int kSettleSteps = 10;
+    constexpr float kSettleDeltaTime = 1.0f / 240.0f;
+    for (int settleStep = 0; settleStep < kSettleSteps; ++settleStep) {
+        step(kSettleDeltaTime);
+    }
     impl_->stats = {};
     impl_->stats.particleCount = impl_->particleCount;
     impl_->updateDerivedStateFromPositions();
@@ -572,12 +847,17 @@ void MetalSimulationBackend::step(float deltaTime) {
     impl_->stats.gridBuildMs = 0.0f;
     impl_->stats.densityPassMs = 0.0f;
     impl_->stats.constraintPassMs = 0.0f;
+    impl_->stats.divergencePassMs = 0.0f;
     impl_->stats.integrateMs = 0.0f;
     impl_->stats.finalizeMs = 0.0f;
     impl_->stats.snapshotMs = 0.0f;
     impl_->stats.totalStepMs = 0.0f;
     impl_->stats.neighborSamples = 0;
     impl_->stats.simulatedDeltaTime = glm::clamp(deltaTime, kMinDeltaTime, kMaxDeltaTime);
+    impl_->stats.executedDivergenceIterations = 0;
+    impl_->stats.snapshotInterval = 1;
+    impl_->stats.averageDivergenceError = 0.0f;
+    impl_->stats.realTimeRatio = 1.0f;
 
     const float clampedDeltaTime = impl_->stats.simulatedDeltaTime;
     const float safeTravel =
@@ -592,6 +872,7 @@ void MetalSimulationBackend::step(float deltaTime) {
     );
     impl_->stats.executedSubsteps = effectiveSubsteps;
     impl_->stats.executedSolverIterations = impl_->settings.pressureIterations;
+    impl_->stats.executedDivergenceIterations = std::max(1, impl_->settings.pressureIterations / 2);
     const float substepDelta = clampedDeltaTime / static_cast<float>(effectiveSubsteps);
 
     for (int substep = 0; substep < effectiveSubsteps; ++substep) {
@@ -599,23 +880,46 @@ void MetalSimulationBackend::step(float deltaTime) {
         impl_->runIntegrate(substepDelta);
         impl_->stats.integrateMs += toMilliseconds(Clock::now() - phaseStart);
 
+        std::memset([impl_->densityPressureBuffer contents], 0, impl_->particleCount * sizeof(float));
+        std::memset([impl_->divergencePressureBuffer contents], 0, impl_->particleCount * sizeof(float));
+        std::memset([impl_->divergenceErrorBuffer contents], 0, impl_->particleCount * sizeof(float));
+
         for (int iteration = 0; iteration < impl_->settings.pressureIterations; ++iteration) {
             phaseStart = Clock::now();
             impl_->rebuildGrid(substepDelta);
             impl_->stats.gridBuildMs += toMilliseconds(Clock::now() - phaseStart);
 
             phaseStart = Clock::now();
-            impl_->runDensityLambda(substepDelta);
+            impl_->runDensityAlpha(substepDelta);
             impl_->stats.densityPassMs += toMilliseconds(Clock::now() - phaseStart);
 
             phaseStart = Clock::now();
-            impl_->runCorrections(substepDelta);
+            impl_->runDensityCorrectionIteration(substepDelta);
             impl_->stats.constraintPassMs += toMilliseconds(Clock::now() - phaseStart);
         }
 
         phaseStart = Clock::now();
         impl_->rebuildGrid(substepDelta);
         impl_->stats.gridBuildMs += toMilliseconds(Clock::now() - phaseStart);
+
+        phaseStart = Clock::now();
+        impl_->updateProvisionalVelocities(substepDelta);
+        impl_->stats.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+
+        phaseStart = Clock::now();
+        impl_->runDivergenceAlpha(substepDelta);
+        impl_->stats.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+        for (int iteration = 0; iteration < impl_->stats.executedDivergenceIterations; ++iteration) {
+            if (iteration > 0) {
+                phaseStart = Clock::now();
+                impl_->runDivergenceAlpha(substepDelta);
+                impl_->stats.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+            }
+
+            phaseStart = Clock::now();
+            impl_->runDivergenceCorrectionIteration(substepDelta);
+            impl_->stats.divergencePassMs += toMilliseconds(Clock::now() - phaseStart);
+        }
 
         phaseStart = Clock::now();
         impl_->runFinalize(substepDelta);

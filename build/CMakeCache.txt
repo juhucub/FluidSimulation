@@ -384,6 +384,9 @@ glad_IS_TOP_LEVEL:STATIC=OFF
 //Value Computed by CMake
 glad_SOURCE_DIR:STATIC=/Users/jacobgardner/Documents/projects/FluidSimulation/external-dependencies/glad
 
+//Dependencies for the target
+glfw_LIB_DEPENDS:STATIC=general;-framework Cocoa;general;-framework IOKit;general;-framework CoreFoundation;
+
 //Value Computed by CMake
 glm_BINARY_DIR:STATIC=/Users/jacobgardner/Documents/projects/FluidSimulation/build/external-dependencies/glm
 
